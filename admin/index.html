@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Harper Palembang Virtual Tour</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        :root {
+            --primary: #C8A96A;
+            --primary-light: #d4bb8a;
+            --primary-dark: #a88a4d;
+            --bg-dark: #0d0d0d;
+            --bg-card: rgba(26, 26, 26, 0.9);
+            --bg-glass: rgba(20, 20, 20, 0.7);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: rgba(200, 169, 106, 0.2);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 20px rgba(200, 169, 106, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        
+        /* Container utama - Biarkan diatur sepenuhnya oleh Pannellum */ 
+        .custom-arrow-hotspot { 
+            width: 40px !important;
+            height: 40px !important;
+            cursor: pointer; 
+            z-index: 50; 
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        } 
+ 
+        /* Elemen dalam yang menampung gambar ikon dan animasi */ 
+        .custom-arrow-hotspot::after { 
+            content: ""; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803810/WhatsApp_Image_2026-06-30_at_13.46.54_qsub6b.jpg');
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            /* Jalankan animasi di sini, aman dari koordinat utama */ 
+            animation: hotspotPulse 2s infinite ease-in-out; 
+            transition: transform 0.2s ease, filter 0.2s ease; 
+        } 
+ 
+        /* Efek hover saat kursor mendekat */ 
+        .custom-arrow-hotspot:hover::after { 
+            transform: scale(1.15); 
+            filter: drop-shadow(0px 0px 8px rgba(30, 144, 255, 0.8)); 
+        } 
+ 
+        /* Animasi denyut baru yang aman (hanya mengubah skala visual elemen dalam) */ 
+        @keyframes hotspotPulse { 
+            0% { 
+                transform: scale(1); 
+                opacity: 0.9; 
+            } 
+            50% { 
+                transform: scale(1.1); 
+                opacity: 1; 
+                filter: drop-shadow(0px 0px 6px rgba(30, 144, 255, 0.5)); 
+            } 
+            100% { 
+                transform: scale(1); 
+                opacity: 0.9; 
+            } 
+        }
+
+        /* Override Pannellum's default hotspot bg */
+        .custom-arrow-hotspot.pnlm-hotspot {
+            background-color: transparent !important;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .nav-links {
+            flex: 1;
+            padding: 1.5rem 1rem;
+        }
+        .nav-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+        .nav-item:hover {
+            background: rgba(200, 169, 106, 0.1);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(200, 169, 106, 0.2), rgba(200, 169, 106, 0.05));
+            color: var(--primary);
+            border: 1px solid var(--border);
+            box-shadow: var(--glow);
+        }
+        .logout-btn {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            color: #ff5555;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            margin: 0 1rem 1rem;
+            border-radius: 12px;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 85, 85, 0.1);
+            transform: translateX(4px);
+        }
+
+        /* Views */
+        #settingsView, #usersView {
+            display: none;
+        }
+
+        /* Settings Card */
+        .settings-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        /* User Table */
+        .user-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        th {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(200, 169, 106, 0.05);
+        }
+        tr:hover td {
+            background: rgba(200, 169, 106, 0.05);
+        }
+        .role-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .role-admin {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        .role-user {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+        .settings-section-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .music-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .music-item:hover {
+            background: rgba(200, 169, 106, 0.05);
+            border-color: var(--primary);
+        }
+        .social-edit-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 2fr 50px;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .social-edit-item:hover {
+            background: rgba(200, 169, 106, 0.05);
+            border-color: var(--primary);
+        }
+        .icon-preview {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            border-radius: 12px;
+            font-size: 1.25rem;
+            box-shadow: var(--glow);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: transparent;
+            box-shadow: var(--glow);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            box-shadow: var(--shadow-soft);
+        }
+        .btn-primary:hover {
+            background: var(--text-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(200, 169, 106, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: rgba(200, 169, 106, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Dashboard Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.75rem;
+        }
+        .scene-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-soft);
+        }
+        .scene-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 36px rgba(200, 169, 106, 0.3);
+        }
+        .scene-thumb {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .scene-info {
+            padding: 1.5rem;
+        }
+        .scene-title {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .scene-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+        }
+        .card-actions {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .action-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(200, 169, 106, 0.1);
+        }
+        .delete-btn:hover {
+            color: #ff5555;
+            border-color: rgba(255, 85, 85, 0.5);
+            background: rgba(255, 85, 85, 0.1);
+        }
+
+        /* Editor Overlay */
+        #editorOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        .editor-header {
+            height: 70px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            box-shadow: var(--shadow-soft);
+        }
+        .editor-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .editor-container {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+        }
+        #editorViewer {
+            flex: 1;
+            background: #000;
+        }
+        .editor-sidebar {
+            width: 380px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* Hotspot Edit Item */
+        .hotspot-edit-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hotspot-edit-item:hover {
+            border-color: var(--primary);
+            background: rgba(200, 169, 106, 0.05);
+            transform: translateY(-2px);
+        }
+        .hotspot-edit-item.moving {
+            border: 2px dashed var(--primary);
+            background: rgba(200, 169, 106, 0.1);
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--primary); }
+            50% { border-color: var(--primary-light); }
+        }
+        .hs-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .hs-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .hs-btn:hover {
+            transform: scale(1.15);
+        }
+        .hs-delete {
+            color: #ff5555;
+        }
+        .hs-delete:hover {
+            background: rgba(255, 85, 85, 0.15);
+        }
+        .hs-move {
+            color: var(--primary);
+            cursor: grab;
+        }
+        .hs-move:hover {
+            background: rgba(200, 169, 106, 0.15);
+        }
+        .hs-move:active {
+            cursor: grabbing;
+        }
+        
+        /* Draggable UI */
+        .draggable-hotspot-tool {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-bottom: 1.75rem;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            box-shadow: var(--glow);
+        }
+        .draggable-hotspot-tool:hover {
+            background: var(--text-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(200, 169, 106, 0.4);
+        }
+        .draggable-hotspot-tool:active {
+            cursor: grabbing;
+            transform: translateY(-1px);
+        }
+
+        .scene-tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: grab;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .scene-tool-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            border-color: transparent;
+            transform: translateX(4px);
+        }
+        .scene-tool-btn:active {
+            cursor: grabbing;
+        }
+        .draggable-hotspot-tool i {
+            font-size: 1.3rem;
+        }
+
+        /* Highlight viewer when dragging over */
+        #editorViewer.drag-over {
+            box-shadow: inset 0 0 80px rgba(200, 169, 106, 0.4);
+        }
+
+        .pnlm-hotspot.editable-hs {
+            cursor: move !important;
+        }
+        
+        .mode-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 12px;
+            background: #2ecc71;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .mode-badge.moving {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            animation: pulse-glow 1.5s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(200, 169, 106, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(200, 169, 106, 0);
+            }
+        }
+        
+        /* Modal / Form */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal.open {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 640px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: modal-appear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.75rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .close-modal:hover {
+            color: var(--primary);
+            background: rgba(200, 169, 106, 0.1);
+            transform: rotate(90deg);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(200, 169, 106, 0.05);
+            box-shadow: var(--glow);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        #jsonOutput {
+            display: none;
+            margin-top: 2rem;
+            background: #000;
+            color: #0f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid var(--border);
+        }
+        
+        .hint-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: block;
+            line-height: 1.6;
+        }
+
+        /* Server Status Badge */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>HARPER ADMIN</h2>
+            <div id="autoSaveStatus" style="margin-top: 0.5rem; font-size: 0.75rem; color: #888; height: 1.2rem; line-height: 1.2rem; transition: color 0.3s;">
+                Semua perubahan disimpan
+            </div>
+        </div>
+        <div class="nav-links">
+            <div class="nav-item active" id="navScenes"><i class="fas fa-th-large"></i> Scenes</div>
+            <div class="nav-item" id="navSettings"><i class="fas fa-cog"></i> Settings</div>
+            <div class="nav-item admin-only" id="navUsers"><i class="fas fa-users"></i> Akun</div>
+            <a href="../index.html" class="nav-item" style="text-decoration: none; margin-top: auto;"><i class="fas fa-home"></i> Lihat Website</a>
+        </div>
+        <div class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar</div>
+    </div>
+
+    <div class="main-content">
+        <!-- Scene Management View -->
+        <div id="scenesView">
+            <div class="header">
+                <h1>Manajemen Scene Virtual Tour</h1>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="serverStatusBadge" class="badge" style="padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; background: #555; color: #fff;">Server: Mengecek...</span>
+                    <span id="autoSaveStatus" style="font-size: 0.8rem; color: #888;"></span>
+                    <button class="btn btn-secondary" onclick="loadConfig()"><i class="fas fa-sync-alt"></i> Refresh Config</button>
+                    <button class="btn btn-primary" onclick="saveConfigToServer()"><i class="fas fa-save"></i> Simpan Permanen</button>
+                    <button class="btn btn-secondary" onclick="exportConfig()"><i class="fas fa-download"></i> Backup JSON</button>
+                    <button class="btn btn-primary" onclick="editScene()"><i class="fas fa-plus"></i> Tambah Scene</button>
+                </div>
+            </div>
+
+            <div class="grid" id="sceneGrid">
+                <!-- Scenes will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Settings Management View -->
+        <div id="settingsView" style="display: none;">
+            <div class="header">
+                <h1>Pengaturan Website</h1>
+                <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Simpan Pengaturan</button>
+            </div>
+
+            <div class="settings-card admin-only">
+                <h3 class="settings-section-title"><i class="fas fa-play-circle"></i> Konfigurasi Tour</h3>
+                <div class="form-group">
+                    <label>Scene Utama (First Scene)</label>
+                    <select id="settingFirstScene" style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
+                        <!-- Dinamis -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-image"></i> Upload Logo Custom (sesuai permintaan)</label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="file" id="customLogoUpload" accept="image/*" style="flex: 1;">
+                        <button type="button" class="btn btn-primary" onclick="uploadCustomLogo()" id="customLogoUploadBtn">
+                            <i class="fas fa-upload"></i> Upload Logo
+                        </button>
+                    </div>
+                    <div id="customLogoPreviewContainer" class="music-item" style="height: auto; padding: 10px; display: none;">
+                        <span>Logo saat ini: </span>
+                        <img id="customLogoPreview" src="" alt="Custom Logo Preview" style="max-height: 60px; margin-left: 10px;">
+                        <button class="action-btn delete-btn" onclick="deleteCustomLogo()" style="margin-left: auto;"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card admin-only">
+                <h3 class="settings-section-title"><i class="fas fa-image"></i> Pengaturan Logo</h3>
+                <div class="form-group">
+                    <label>Logo Saat Ini</label>
+                    <div id="currentLogoInfo" class="music-item" style="height: auto; padding: 10px;">
+                        <div id="logoPreviewContainer" style="position: relative; display: inline-block; background: linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333); background-size: 20px 20px; background-position: 0 0, 10px 10px; border-radius: 8px; padding: 10px;">
+                            <img id="logoPreview" src="" alt="Logo Preview" style="display: none;">
+                        </div>
+                        <span id="logoPathText">Belum ada logo terpilih</span>
+                        <button class="action-btn delete-btn" id="deleteLogoBtn" style="display: none;"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Upload Logo Baru</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="file" id="logoUpload" accept="image/*" style="flex: 1;">
+                        <button type="button" class="btn btn-secondary" onclick="uploadLogo()" id="logoUploadBtn">
+                            <i class="fas fa-upload"></i> Upload Logo
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran Logo (px): <span id="logoSizeValue">60</span></label>
+                    <input type="range" id="logoSize" min="30" max="200" value="60" oninput="updateLogoPreview()">
+                </div>
+                <div class="form-group">
+                    <label>Opacity (%): <span id="logoOpacityValue">100</span></label>
+                    <input type="range" id="logoOpacity" min="10" max="100" value="100" oninput="updateLogoPreview()">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="logoDropShadow" checked onchange="updateLogoPreview()">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Tampilkan Drop Shadow</span>
+                </div>
+                <div class="form-group">
+                    <label>Posisi Logo:</label>
+                    <select id="logoPosition" onchange="updateLogoPreview()">
+                        <option value="top-left">Atas Kiri</option>
+                        <option value="top-center">Atas Tengah</option>
+                        <option value="top-right">Atas Kanan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Efek:</label>
+                    <div style="display: flex; gap: 20px;">
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" id="logoEffectFadeIn" onchange="updateLogoPreview()">
+                            Fade In saat load
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" id="logoEffectHoverBlur" onchange="updateLogoPreview()">
+                            Blur saat hover
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3 class="settings-section-title"><i class="fas fa-music"></i> Pengaturan Musik Latar</h3>
+                <div class="form-group">
+                    <label>Status Auto-play</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="musicAutoPlay">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Putar otomatis saat masuk (User interaction tetap diperlukan di browser modern)</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Musik Saat Ini</label>
+                    <div id="currentMusicInfo" class="music-item">
+                        <span>Belum ada musik terpilih</span>
+                        <button class="action-btn delete-btn" id="deleteMusicBtn" style="display: none;"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>URL Musik (Lagu)</label>
+                    <input type="text" id="musicUrlInput" placeholder="https://... atau path/ke/musik.mp3">
+                    <small class="hint-text">Anda bisa mengupload file di bawah atau memasukkan link CDN secara manual.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Musik Baru (.mp3)</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="file" id="musicUpload" accept="audio/mpeg" style="flex: 1;">
+                        <button type="button" class="btn btn-secondary" onclick="uploadMusic()" id="musicUploadBtn">
+                            <i class="fas fa-upload"></i> Upload Musik
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card admin-only">
+                <h3 class="settings-section-title"><i class="fas fa-shoe-prints"></i> Pengaturan Footer & Sosial Media</h3>
+                <div class="form-group">
+                    <label>Copyright Text</label>
+                    <input type="text" id="footerCopyright">
+                </div>
+                <div class="form-group">
+                    <label>Nomor WhatsApp</label>
+                    <input type="tel" id="footerPhone" placeholder="+62...">
+                </div>
+                <div class="form-group">
+                    <label>Link Reservasi Hotel</label>
+                    <input type="url" id="footerReserveLink" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>Sosial Media</label>
+                    <div id="socialMediaStaticList">
+                        <div class="social-edit-item">
+                            <div class="icon-preview"><i class="fab fa-instagram"></i></div>
+                            <input type="url" id="socialInstagram" placeholder="Instagram URL">
+                        </div>
+                        <div class="social-edit-item">
+                            <div class="icon-preview"><i class="fab fa-twitter"></i></div>
+                            <input type="url" id="socialTwitter" placeholder="Twitter URL">
+                        </div>
+                        <div class="social-edit-item">
+                            <div class="icon-preview"><i class="fab fa-facebook-f"></i></div>
+                            <input type="url" id="socialFacebook" placeholder="Facebook URL">
+                        </div>
+                        <div class="social-edit-item">
+                            <div class="icon-preview"><i class="fab fa-tiktok"></i></div>
+                            <input type="url" id="socialTikTok" placeholder="TikTok URL">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Management View -->
+        <div id="usersView" style="display: none;">
+            <div class="header">
+                <h1>Manajemen Akun Pengguna</h1>
+                <button class="btn btn-primary" onclick="openUserModal()"><i class="fas fa-plus"></i> Tambah Pengguna</button>
+            </div>
+
+            <div class="settings-card">
+                <h3 class="settings-section-title"><i class="fas fa-user-cog"></i> Daftar Pengguna</h3>
+                <div class="user-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="jsonOutput"></div>
+    </div>
+
+    <!-- Modal User -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Tambah Pengguna Baru</h2>
+                <i class="fas fa-times close-modal" onclick="closeUserModal()"></i>
+            </div>
+            <form id="userForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="newUsername" required placeholder="Masukkan username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="newPassword" required placeholder="Masukkan password">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newRole" required style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">SIMPAN PENGGUNA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Scene Basic Info -->
+    <div class="modal" id="sceneModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Scene Baru</h2>
+                <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+            </div>
+            <form id="sceneForm">
+                <input type="hidden" id="editSceneId">
+                <div class="form-group">
+                    <label>ID Scene (Unique, e.g: lobby_utama)</label>
+                    <input type="text" id="sceneId" required>
+                </div>
+                <div class="form-group">
+                    <label>Judul Scene</label>
+                    <input type="text" id="sceneTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Foto Panorama</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="file" id="photoUpload" accept="image/*" style="flex: 1;">
+                    </div>
+                    <small id="uploadStatus" style="color: var(--secondary); display: block; margin-top: 5px;"></small>
+                    <div id="modalPanoramaPreview" style="margin-top: 10px; display: none; position: relative;">
+                        <img src="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--primary);">
+                        <div id="uploadProgressOverlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: none; align-items: center; justify-content: center;">
+                            <div style="text-align: center; color: white;">
+                                <div style="width: 200px; height: 8px; background: #444; border-radius: 4px; margin-bottom: 8px;">
+                                    <div id="uploadProgressBar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s;"></div>
+                                </div>
+                                <small id="uploadProgressText">0%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="scenePanorama">
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="sceneDesc" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Informasi Scene (Opsional)</label>
+                    <textarea id="sceneInfoText" rows="5" placeholder="Tulis informasi tambahan untuk scene ini..."></textarea>
+                </div>
+                
+                <div id="modalActionContainer">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">SIMPAN & EDIT VISUAL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Visual Editor Overlay -->
+    <div id="editorOverlay">
+        <div class="editor-header">
+            <div style="display: flex; align-items: center;">
+                <h3 id="editingSceneTitle">Editor Visual</h3>
+                <span class="mode-badge">Hotspot Editor</span>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="closeEditor()"><i class="fas fa-times"></i> Tutup</button>
+                <button class="btn btn-primary" onclick="saveEditorChanges()"><i class="fas fa-save"></i> Simpan Hotspots</button>
+            </div>
+        </div>
+        <div class="editor-container">
+            <div id="editorViewer"></div>
+            <div class="editor-sidebar">
+                <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Tambah Hotspot</h4>
+                <div class="draggable-hotspot-tool" draggable="true" id="newHotspotTool">
+                    <i class="fas fa-link"></i> HOTSPOT LINK SCENE
+                </div>
+                <div class="draggable-hotspot-tool" draggable="true" id="newInfoHotspotTool" style="margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> HOTSPOT INFO
+                </div>
+
+                <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Quick Scene Link</h4>
+                <p class="hint-text">Drag scene ke gambar untuk menambah link.</p>
+                <div id="editorSceneList" style="margin-bottom: 1.5rem; max-height: 200px; overflow-y: auto;">
+                    <!-- Draggable scene buttons will be here -->
+                </div>
+                
+                <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Daftar Hotspots</h4>
+                <span class="hint-text">Klik gambar untuk tambah, atau drag hotspot/icon pindah posisi.</span>
+                <div id="editorHotspotsList">
+                    <!-- Hotspots will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check Login & Role
+        function checkLogin() {
+            if (localStorage.getItem('cms_logged_in') !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+        
+        function applyRBAC() {
+            const role = localStorage.getItem('cms_role') || 'client';
+            const navSettings = document.getElementById('navSettings');
+            const adminOnlyElements = document.querySelectorAll('.admin-only');
+            
+            if (role === 'client') {
+                if (navSettings) navSettings.style.display = 'none';
+                adminOnlyElements.forEach(el => el.style.display = 'none');
+                console.log("RBAC: Client mode applied");
+            } else {
+                console.log("RBAC: Admin mode applied");
+            }
+        }
+        
+        checkLogin();
+        applyRBAC();
+
+        // Navigation
+        document.getElementById('navScenes').onclick = () => switchView('scenes');
+        document.getElementById('navSettings').onclick = () => switchView('settings');
+        document.getElementById('navUsers').onclick = () => {
+            switchView('users');
+            loadUsers();
+        };
+
+        function switchView(view) {
+            // Hide all views
+            document.getElementById('scenesView').style.display = 'none';
+            document.getElementById('settingsView').style.display = 'none';
+            document.getElementById('usersView').style.display = 'none';
+            
+            // Remove active class from all nav items
+            document.getElementById('navScenes').classList.remove('active');
+            document.getElementById('navSettings').classList.remove('active');
+            document.getElementById('navUsers').classList.remove('active');
+            
+            // Show selected view and mark as active
+            if (view === 'scenes') {
+                document.getElementById('scenesView').style.display = 'block';
+                document.getElementById('navScenes').classList.add('active');
+            } else if (view === 'settings') {
+                document.getElementById('settingsView').style.display = 'block';
+                document.getElementById('navSettings').classList.add('active');
+            } else if (view === 'users') {
+                document.getElementById('usersView').style.display = 'block';
+                document.getElementById('navUsers').classList.add('active');
+            }
+        }
+
+        document.getElementById('logoutBtn').onclick = () => {
+            localStorage.removeItem('cms_logged_in');
+            localStorage.removeItem('cms_role');
+            localStorage.removeItem('cms_user_id');
+            localStorage.removeItem('cms_username');
+            window.location.href = 'login.html';
+        };
+
+        let config = null;
+        let panoEditorViewer = null;
+        let currentEditingId = null;
+        let tempHotspots = [];
+        let movingHotspotIndex = null;
+        let isDraggingNew = false;
+        let draggedHSIndex = null;
+        let pendingHotspotType = null;
+        let hasUnsavedChanges = false;
+        let autoSaveTimeout = null;
+        let sceneAutoSaveTimeout = null;
+
+        function getApiUrl(endpoint) {
+            // Jika kita berada di http://localhost:3000 atau IP lainnya lewat server
+            if (window.location.protocol.startsWith('http')) {
+                // Gunakan origin yang sama agar tidak kena masalah CORS
+                return window.location.origin + endpoint;
+            }
+            // Fallback jika dibuka via file:// (double click file)
+            return 'http://localhost:3000' + endpoint;
+        }
+
+        let currentUploadAbortController = null;
+
+        // Instant preview and auto-upload when file is selected
+        document.getElementById('photoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Instant preview
+            const previewDiv = document.getElementById('modalPanoramaPreview');
+            const previewImg = previewDiv.querySelector('img');
+            const objectUrl = URL.createObjectURL(file);
+            previewImg.src = objectUrl;
+            previewDiv.style.display = 'block';
+
+            // Cancel any ongoing upload
+            if (currentUploadAbortController) {
+                currentUploadAbortController.abort();
+            }
+
+            // Start background upload
+            currentUploadAbortController = new AbortController();
+            uploadPhotoBackground(file, currentUploadAbortController.signal);
+        });
+
+        async function uploadPhotoBackground(file, signal) {
+            const status = document.getElementById('uploadStatus');
+            const progressOverlay = document.getElementById('uploadProgressOverlay');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('uploadProgressText');
+
+            status.style.color = "var(--secondary)";
+            status.innerText = "Menyimpan foto panorama...";
+            progressOverlay.style.display = "flex";
+            progressBar.style.width = "0%";
+            progressText.innerText = "0%";
+
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            try {
+                const uploadUrl = getApiUrl('/api/upload');
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: formData,
+                    signal: signal
+                });
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`Server error (${response.status}): ${errText}`);
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    const normalizedPath = result.filePath.replace(/\\/g, '/');
+                    document.getElementById('scenePanorama').value = normalizedPath;
+                    
+                    // Update preview to use the server's file (not the object URL)
+                    const previewImg = document.getElementById('modalPanoramaPreview').querySelector('img');
+                    previewImg.src = isAbsoluteUrl(normalizedPath) ? normalizedPath : '../' + normalizedPath;
+                    
+                    status.style.color = "green";
+                    status.innerText = "Berhasil diunggah: " + normalizedPath;
+                    
+                    // Auto-save the scene if we're editing an existing one
+                    const editId = document.getElementById('editSceneId').value;
+                    if (editId) {
+                        config.scenes[editId].panorama = normalizedPath;
+                        await triggerSceneAutoSave(editId);
+                    }
+                } else {
+                    throw new Error(result.message || "Gagal mengunggah");
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    status.innerText = "Upload dibatalkan";
+                    return;
+                }
+                console.error("Upload error detail:", error);
+                status.style.color = "red";
+                status.innerText = "Error: " + error.message;
+            } finally {
+                progressOverlay.style.display = "none";
+            }
+        }
+
+        // Auto-save state
+        let isSavingScene = false;
+
+        // Update auto-save status indicator
+        function updateAutoSaveStatus(state) {
+            const statusEl = document.getElementById('autoSaveStatus');
+            if (!statusEl) return;
+
+            switch(state) {
+                case 'typing':
+                    statusEl.innerText = "Mengetik...";
+                    statusEl.style.color = "#888";
+                    break;
+                case 'saving':
+                    statusEl.innerText = "Menyimpan perubahan...";
+                    statusEl.style.color = "#f39c12";
+                    break;
+                case 'saved':
+                    statusEl.innerText = "Semua perubahan disimpan";
+                    statusEl.style.color = "#27ae60";
+                    break;
+            }
+        }
+
+        // Debounced auto-save trigger
+        function triggerSceneAutoSave(editId) {
+            if (!editId) return;
+
+            // Clear existing timeout
+            if (sceneAutoSaveTimeout) {
+                clearTimeout(sceneAutoSaveTimeout);
+            }
+
+            updateAutoSaveStatus('typing');
+
+            // Set new timeout
+            sceneAutoSaveTimeout = setTimeout(async () => {
+                await saveSceneChanges(editId);
+            }, 800);
+        }
+
+        // Save the scene changes
+        async function saveSceneChanges(editId) {
+            if (isSavingScene) return;
+            isSavingScene = true;
+            updateAutoSaveStatus('saving');
+
+            try {
+                // Update config object first
+                const updates = {
+                    title: document.getElementById('sceneTitle').value,
+                    description: document.getElementById('sceneDesc').value,
+                    panorama: document.getElementById('scenePanorama').value,
+                    infoText: document.getElementById('sceneInfoText').value
+                };
+
+                // Apply to local config
+                config.scenes[editId] = { ...config.scenes[editId], ...updates };
+
+                // Save partial changes via PATCH (faster)
+                const patchUrl = getApiUrl(`/api/scenes/${editId}`);
+                const response = await fetch(patchUrl, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+
+                if (response.ok) {
+                    updateAutoSaveStatus('saved');
+                } else {
+                    throw new Error('Failed to save changes');
+                }
+            } catch (error) {
+                console.error("Error saving scene changes:", error);
+                updateAutoSaveStatus('typing');
+            } finally {
+                isSavingScene = false;
+            }
+        }
+
+        // Add event listeners for text inputs
+        document.getElementById('sceneTitle').addEventListener('input', function() {
+            const editId = document.getElementById('editSceneId').value;
+            if (editId) {
+                triggerSceneAutoSave(editId);
+            }
+        });
+
+        document.getElementById('sceneDesc').addEventListener('input', function() {
+            const editId = document.getElementById('editSceneId').value;
+            if (editId) {
+                triggerSceneAutoSave(editId);
+            }
+        });
+
+        document.getElementById('sceneInfoText').addEventListener('input', function() {
+            const editId = document.getElementById('editSceneId').value;
+            if (editId) {
+                triggerSceneAutoSave(editId);
+            }
+        });
+
+        function showServerError() {
+            alert("Gagal Terhubung ke Server!\n\n" +
+                  "Penyebab: Perintah 'node server.js' belum dijalankan atau Node.js belum terinstal.\n\n" +
+                  "Cara Perbaiki:\n" +
+                  "1. Buka Terminal di Trae (Ctrl + `)\n" +
+                  "2. Ketik: node server.js\n" +
+                  "3. Pastikan server tetap menyala.");
+        }
+
+        async function checkServerStatus() {
+            const badge = document.getElementById('serverStatusBadge');
+            
+            // Peringatan Protokol
+            if (window.location.protocol === 'file:') {
+                badge.innerText = "Protocol: FILE (Gunakan HTTP)";
+                badge.style.background = "#f39c12"; // Orange
+                console.warn("CMS dibuka via file://. Disarankan membukanya lewat http://localhost:3000/admin/index.html");
+                return;
+            }
+
+            try {
+                // Gunakan endpoint status yang ringan
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch(getApiUrl('/api/status?t=' + Date.now()), {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    badge.innerText = "Server: Online";
+                    badge.style.background = "#27ae60"; // Green
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                badge.innerText = "Server: Offline";
+                badge.style.background = "#c0392b"; // Red
+                // Log warning only if it's not an intentional abort
+                if (e.name !== 'AbortError') {
+                    console.warn("Server status check failed:", e.message);
+                }
+            }
+        }
+
+        // Jalankan saat load
+        checkServerStatus();
+        // Cek berkala setiap 10 detik
+        setInterval(checkServerStatus, 10000);
+
+        // User Management Functions
+        let users = [];
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(getApiUrl('/api/users'), {
+                    headers: {
+                        'role': localStorage.getItem('cms_role')
+                    }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    users = result.users;
+                    renderUsers();
+                } else {
+                    alert(result.message || 'Gagal memuat daftar pengguna');
+                }
+            } catch (error) {
+                console.error('Load users error:', error);
+                alert('Gagal terhubung ke server');
+            }
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                const roleClass = user.role === 'admin' ? 'role-admin' : 'role-user';
+                
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td><span class="role-badge ${roleClass}">${user.role.toUpperCase()}</span></td>
+                    <td>
+                        <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openUserModal() {
+            document.getElementById('userModal').classList.add('open');
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newRole').value = 'user';
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('open');
+        }
+
+        document.getElementById('userForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                
+                const response = await fetch(getApiUrl('/api/users'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'role': localStorage.getItem('cms_role')
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('newUsername').value,
+                        password: document.getElementById('newPassword').value,
+                        role: document.getElementById('newRole').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Pengguna berhasil ditambahkan!');
+                    closeUserModal();
+                    loadUsers();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Create user error:', error);
+                alert('Gagal membuat pengguna: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
+        };
+
+        async function deleteUser(userId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(getApiUrl(`/api/users/${userId}`), {
+                    method: 'DELETE',
+                    headers: {
+                        'role': localStorage.getItem('cms_role')
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Pengguna berhasil dihapus!');
+                    loadUsers();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Delete user error:', error);
+                alert('Gagal menghapus pengguna: ' + error.message);
+            }
+        }
+
+        async function loadConfig() {
+            try {
+                console.log('📥 Memuat config dari server...');
+                const response = await fetch(getApiUrl('/api/config?v=' + Date.now()));
+                config = await response.json();
+                console.log('✅ Config diterima:', config);
+                console.log('📸 Jumlah scenes:', Object.keys(config.scenes || {}).length);
+                if (!config.scenes) config.scenes = {};
+                if (!config.default) config.default = { firstScene: "", type: "equirectangular" };
+                if (!config.settings) config.settings = { logo: "", logoUrl: "", logoHeight: 60, logoWidth: 150, music: { url: "", autoPlay: true }, footer: {} };
+                if (!config.settings.logoHeight) config.settings.logoHeight = 60;
+                if (!config.settings.logoWidth) config.settings.logoWidth = 150;
+                renderScenes();
+                updateCustomLogoUI();
+            } catch (e) {
+                console.error("❌ Gagal load config", e);
+                showServerError();
+            }
+        }
+
+        function isAbsoluteUrl(url) {
+            return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+        }
+
+        function renderScenes() {
+            const grid = document.getElementById('sceneGrid');
+            grid.innerHTML = '';
+            console.log('🎨 Rendering', Object.keys(config.scenes || {}).length, 'scenes...');
+            
+            for (const [id, scene] of Object.entries(config.scenes)) {
+                const card = document.createElement('div');
+                card.className = 'scene-card';
+                // Encode URL to handle spaces in filenames
+                const thumbUrl = isAbsoluteUrl(scene.panorama) ? scene.panorama : encodeURI('../' + scene.panorama);
+                console.log(`   Scene ${id} | panorama:`, scene.panorama, '| thumbUrl:', thumbUrl);
+                card.innerHTML = `
+                    <div class="scene-thumb" style="background-image: url('${thumbUrl}')"></div>
+                    <div class="scene-info">
+                        <div class="scene-title">${scene.title}</div>
+                        <div class="scene-meta">
+                            <span><i class="fas fa-link"></i> ${scene.hotSpots ? scene.hotSpots.length : 0} Hotspots</span>
+                            <span>ID: ${id}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="openEditor('${id}')"><i class="fas fa-vr-cardboard"></i> Visual Edit</button>
+                        <button class="action-btn" onclick="editScene('${id}')"><i class="fas fa-edit"></i> Info</button>
+                        <button class="action-btn delete-btn" onclick="deleteScene('${id}')"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+            console.log('✅ Selesai render scenes!');
+        }
+
+        function editScene(editId = null) {
+            const modal = document.getElementById('sceneModal');
+            const form = document.getElementById('sceneForm');
+            const title = document.getElementById('modalTitle');
+            const status = document.getElementById('uploadStatus');
+            const sceneIdInput = document.getElementById('sceneId');
+            const sceneTitleInput = document.getElementById('sceneTitle');
+            const sceneDescInput = document.getElementById('sceneDesc');
+            const sceneInfoTextInput = document.getElementById('sceneInfoText');
+            const previewDiv = document.getElementById('modalPanoramaPreview');
+            
+            form.reset();
+            if (status) status.innerText = ''; 
+            if (previewDiv) previewDiv.style.display = 'none';
+            
+            if (editId) {
+                const scene = config.scenes[editId];
+                document.getElementById('editSceneId').value = editId;
+                sceneIdInput.value = editId;
+                sceneIdInput.disabled = true;
+                sceneTitleInput.value = scene.title;
+                document.getElementById('scenePanorama').value = scene.panorama;
+                sceneDescInput.value = scene.description;
+                sceneInfoTextInput.value = scene.infoText || '';
+                title.innerText = "Edit Info Scene: " + scene.title;
+                
+                if (previewDiv && scene.panorama) {
+                    previewDiv.style.display = 'block';
+                    previewDiv.querySelector('img').src = isAbsoluteUrl(scene.panorama) ? scene.panorama : '../' + scene.panorama;
+                }
+            } else {
+                document.getElementById('editSceneId').value = '';
+                sceneIdInput.disabled = false;
+                title.innerText = "Tambah Scene Baru";
+            }
+            
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('sceneModal').classList.remove('open');
+        }
+
+        // Helper to create slug from title
+        function createSlug(text) {
+            return text.toString().toLowerCase()
+                .replace(/\s+/g, '_')           // Replace spaces with _
+                .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                .replace(/\-\-+/g, '_')         // Replace multiple - with single _
+                .replace(/^-+/, '')             // Trim - from start of text
+                .replace(/-+$/, '');            // Trim - from end of text
+        }
+
+        document.getElementById('sceneForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+
+            try {
+                const editId = document.getElementById('editSceneId').value;
+                let id = document.getElementById('sceneId').value.trim();
+                const title = document.getElementById('sceneTitle').value.trim();
+                const panoramaPath = document.getElementById('scenePanorama').value;
+
+                // Frontend validation
+                if (!title || !title.trim()) {
+                    alert("Judul scene tidak boleh kosong!");
+                    document.getElementById('sceneTitle').focus();
+                    return;
+                }
+                if (!panoramaPath) {
+                    alert("Silakan upload foto panorama terlebih dahulu!");
+                    return;
+                }
+
+                if (!editId && !id) id = createSlug(title);
+                if (!id) {
+                    alert("ID Scene tidak boleh kosong!");
+                    return;
+                }
+                
+                const sceneData = {
+                    title: title,
+                    type: "equirectangular",
+                    panorama: panoramaPath,
+                    description: document.getElementById('sceneDesc').value,
+                    infoText: document.getElementById('sceneInfoText').value,
+                    previewImg: panoramaPath,
+                    hfov: editId ? (config.scenes[editId].hfov || 100) : 100,
+                    pitch: editId ? (config.scenes[editId].pitch || 0) : 0,
+                    yaw: editId ? (config.scenes[editId].yaw || 0) : 0,
+                    hotSpots: editId ? (config.scenes[editId].hotSpots || []) : []
+                };
+
+                if (!config.scenes) config.scenes = {};
+                
+                if (editId) {
+                    config.scenes[editId] = sceneData;
+                } else {
+                    if (config.scenes[id]) {
+                        id = id + "_" + Date.now().toString().slice(-4);
+                    }
+                    config.scenes[id] = sceneData;
+                }
+                
+                // Menunjukkan loading state pada tombol
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+                const result = await saveConfigToServer(true); 
+                
+                if (result.success) {
+                    renderScenes();
+                    closeModal();
+                    // Use newSceneId from server if available, otherwise use local id
+                    const finalSceneId = editId || (result.newSceneId || id);
+                    openEditor(finalSceneId); // Buka editor visual
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                    alert("Gagal menyimpan scene: " + (result.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Submit error:", err);
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+                alert("Terjadi kesalahan: " + err.message);
+            }
+        };
+
+        // VISUAL EDITOR LOGIC
+        function openEditor(sceneId) {
+            // Jika pindah scene saat ada perubahan, pastikan sudah tersinkron ke config
+            if (currentEditingId && hasUnsavedChanges) {
+                syncTempToConfig();
+            }
+            
+            currentEditingId = sceneId;
+            movingHotspotIndex = null;
+            const scene = config.scenes[sceneId];
+            // Load existing hotspots
+            tempHotspots = JSON.parse(JSON.stringify(scene.hotSpots || []));
+            // Ensure all hotspots have custom class
+            tempHotspots = tempHotspots.map(hs => ({
+                ...hs,
+                cssClass: hs.type === 'info' ? "custom-info-hotspot" : "custom-arrow-hotspot"
+            }));
+            
+            document.getElementById('editingSceneTitle').innerText = "Editor Visual: " + scene.title;
+            document.getElementById('editorOverlay').style.display = 'flex';
+            
+            renderEditorSceneList();
+            renderEditorHotspotsList();
+            initPannellumEditor(scene);
+            setupDragAndDrop();
+            updateInfoHotspotToolState();
+        }
+
+        function renderEditorSceneList() {
+            const container = document.getElementById('editorSceneList');
+            container.innerHTML = '';
+            
+            for (const [id, scene] of Object.entries(config.scenes)) {
+                if (id === currentEditingId) continue;
+                
+                const btn = document.createElement('div');
+                btn.className = 'scene-tool-btn';
+                btn.draggable = true;
+                btn.innerHTML = `<i class="fas fa-link"></i> ${scene.title}`;
+                btn.ondragstart = (e) => {
+                    isDraggingNew = true;
+                    e.dataTransfer.setData('type', 'scene-hotspot');
+                    e.dataTransfer.setData('data', id);
+                    e.dataTransfer.setData('text', scene.title);
+                };
+                btn.ondragend = () => {
+                    isDraggingNew = false;
+                };
+                container.appendChild(btn);
+            }
+        }
+
+        function initPannellumEditor(scene) {
+            if(panoEditorViewer) panoEditorViewer.destroy();
+            
+            // Add custom class and events to each hotspot
+            const formattedHotspots = tempHotspots.map((hs, index) => ({
+                ...hs,
+                cssClass: hs.type === 'info' ? "custom-info-hotspot" : "custom-arrow-hotspot",
+                createTooltipFunc: (el) => {
+                    el.classList.add('editable-hs');
+                    el.setAttribute('data-index', index);
+                    el.addEventListener('mousedown', (e) => startDraggingHotspot(e, index));
+                    
+                    // Default tooltip content
+                    const span = document.createElement('span');
+                    span.innerText = hs.text || "Hotspot";
+                    el.appendChild(span);
+                }
+            }));
+
+            panoEditorViewer = pannellum.viewer('editorViewer', {
+                "type": "equirectangular",
+                "panorama": isAbsoluteUrl(scene.panorama) ? scene.panorama : "/" + scene.panorama,
+                "autoLoad": true,
+                "hotSpots": formattedHotspots,
+                "hotSpotDebug": false,
+                "backgroundColor": [0.1, 0.1, 0.1]
+            });
+
+            panoEditorViewer.on('error', (err) => {
+                console.error("Editor Pannellum Error:", err);
+                if (err.type === 'webgl') {
+                    alert("WebGL Error: Gagal memuat visual panorama. Pastikan gambar valid dan browser mendukung WebGL.");
+                }
+            });
+
+            // Capture click to add (fallback)
+            panoEditorViewer.on('mousedown', (e) => {
+                if (isDraggingHS || isDraggingNew) return; 
+                
+                const clickTime = Date.now();
+                const onMouseUp = () => {
+                    const duration = Date.now() - clickTime;
+                    if (duration < 200) { // It's a click, not a drag
+                        const coords = panoEditorViewer.mouseEventToCoords(e);
+                        handleViewerClick(coords[0], coords[1]);
+                    }
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                window.addEventListener('mouseup', onMouseUp);
+            });
+        }
+
+        let isDraggingHS = false;
+        function startDraggingHotspot(e, index) {
+            e.preventDefault();
+            e.stopPropagation();
+            isDraggingHS = true;
+            draggedHSIndex = index;
+            
+            const onMouseMove = (moveEvent) => {
+                if (!isDraggingHS) return;
+                // We don't update in real-time to avoid lag, 
+                // but we could if we wanted a smooth experience.
+                document.body.style.cursor = 'grabbing';
+            };
+
+            const onMouseUp = (upEvent) => {
+                const coords = panoEditorViewer.mouseEventToCoords(upEvent);
+                if (coords) {
+                    tempHotspots[draggedHSIndex].pitch = parseFloat(coords[0].toFixed(2));
+                    tempHotspots[draggedHSIndex].yaw = parseFloat(coords[1].toFixed(2));
+                    syncTempToConfig();
+                    refreshEditorView();
+                }
+                isDraggingHS = false;
+                draggedHSIndex = null;
+                document.body.style.cursor = 'default';
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+            };
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        }
+
+        function setupDragAndDrop() {
+            const tool = document.getElementById('newHotspotTool');
+            const infoTool = document.getElementById('newInfoHotspotTool');
+            const viewer = document.getElementById('editorViewer');
+
+            tool.ondragstart = (e) => {
+                isDraggingNew = true;
+                e.dataTransfer.setData('type', 'new-hotspot');
+            };
+            tool.ondragend = () => {
+                isDraggingNew = false;
+            };
+            tool.onclick = () => {
+                pendingHotspotType = 'scene';
+                alert('Klik pada panorama untuk menambahkan hotspot scene.');
+            };
+
+            infoTool.ondragstart = (e) => {
+                isDraggingNew = true;
+                e.dataTransfer.setData('type', 'info-hotspot');
+            };
+            infoTool.ondragend = () => {
+                isDraggingNew = false;
+            };
+            infoTool.onclick = () => {
+                if (tempHotspots.some(hs => hs.type === 'info')) {
+                    alert('Setiap scene hanya boleh memiliki satu hotspot informasi. Hapus hotspot informasi yang ada terlebih dahulu jika ingin mengganti.');
+                    return;
+                }
+                pendingHotspotType = 'info';
+                alert('Klik pada panorama untuk menambahkan hotspot informasi.');
+            };
+
+            viewer.ondragover = (e) => {
+                e.preventDefault();
+                viewer.classList.add('drag-over');
+            };
+
+            viewer.ondragleave = () => {
+                viewer.classList.remove('drag-over');
+            };
+
+            viewer.ondrop = (e) => {
+                e.preventDefault();
+                viewer.classList.remove('drag-over');
+
+                const type = e.dataTransfer.getData('type');
+                const data = e.dataTransfer.getData('data');
+                const text = e.dataTransfer.getData('text');
+                const coords = panoEditorViewer.mouseEventToCoords(e);
+                
+                if (!coords) return;
+
+                if (type === 'new-hotspot') {
+                    addNewHotspot(coords[0], coords[1]);
+                } else if (type === 'info-hotspot') {
+                    addNewHotspot(coords[0], coords[1], null, "Info", "info");
+                } else if (type === 'scene-hotspot') {
+                    addNewHotspot(coords[0], coords[1], data, "Ke " + text);
+                } else if (type === 'move-hotspot') {
+                    const index = parseInt(data);
+                    tempHotspots[index].pitch = parseFloat(coords[0].toFixed(2));
+                    tempHotspots[index].yaw = parseFloat(coords[1].toFixed(2));
+                    syncTempToConfig();
+                    refreshEditorView();
+                }
+            };
+        }
+
+        function updateInfoHotspotToolState() {
+            const infoTool = document.getElementById('newInfoHotspotTool');
+            if (!infoTool) return;
+            const hasInfo = tempHotspots.some(hs => hs.type === 'info');
+            infoTool.style.opacity = hasInfo ? '0.4' : '1';
+            infoTool.style.pointerEvents = hasInfo ? 'none' : 'auto';
+            infoTool.title = hasInfo ? 'Sudah ada hotspot informasi pada scene ini' : 'Tambah hotspot informasi baru';
+        }
+
+        function handleViewerClick(pitch, yaw) {
+            if (movingHotspotIndex !== null) {
+                tempHotspots[movingHotspotIndex].pitch = parseFloat(pitch.toFixed(2));
+                tempHotspots[movingHotspotIndex].yaw = parseFloat(yaw.toFixed(2));
+                const movedIndex = movingHotspotIndex;
+                movingHotspotIndex = null;
+                syncTempToConfig();
+                refreshEditorView();
+                return;
+            }
+
+            if (pendingHotspotType === 'info') {
+                addNewHotspot(pitch, yaw, null, 'Info', 'info');
+                pendingHotspotType = null;
+                return;
+            }
+
+            if (pendingHotspotType === 'scene') {
+                addNewHotspot(pitch, yaw);
+                pendingHotspotType = null;
+                return;
+            }
+
+            if (confirm('Tambah hotspot baru di sini?')) {
+                addNewHotspot(pitch, yaw);
+            }
+        }
+
+        function addNewHotspot(pitch, yaw, sceneId = null, text = null, type = "scene") {
+            if (type === 'info' && tempHotspots.some(hs => hs.type === 'info')) {
+                alert('Setiap scene hanya boleh memiliki satu hotspot informasi. Hapus hotspot informasi yang ada terlebih dahulu jika ingin mengganti.');
+                return;
+            }
+
+            const newHS = {
+                pitch: parseFloat(pitch.toFixed(2)),
+                yaw: parseFloat(yaw.toFixed(2)),
+                type: type,
+                text: text || (type === "info" ? "Info" : "Ke Scene Baru"),
+                tooltip: text || (type === "info" ? "Klik untuk informasi" : "Ganti Deskripsi Ini"),
+                infoText: type === "info" ? "Masukkan teks informasi di sini..." : "",
+                sceneId: type === "scene" ? (sceneId || Object.keys(config.scenes)[0] || "exterior") : undefined,
+                cssClass: type === 'info' ? "custom-info-hotspot" : "custom-arrow-hotspot"
+            };
+            tempHotspots.push(newHS);
+            syncTempToConfig();
+            refreshEditorView();
+        }
+
+        function syncTempToConfig() {
+            if (currentEditingId && config.scenes[currentEditingId]) {
+                config.scenes[currentEditingId].hotSpots = JSON.parse(JSON.stringify(tempHotspots));
+                hasUnsavedChanges = true;
+                updateSaveButtonsUI();
+                updateInfoHotspotToolState();
+                triggerAutoSave();
+            }
+        }
+
+        function triggerAutoSave() {
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            
+            const badge = document.querySelector('.mode-badge');
+            const statusSpan = document.getElementById('autoSaveStatus');
+            let originalText = "";
+            
+            if (badge) {
+                originalText = badge.innerText;
+                badge.innerText = "Auto-saving...";
+                badge.style.background = "#f39c12";
+            }
+            if (statusSpan) statusSpan.innerText = "Menyimpan otomatis...";
+            
+            autoSaveTimeout = setTimeout(async () => {
+                const result = await saveConfigToServer(true);
+                
+                if (result.success) {
+                    if (statusSpan) {
+                        statusSpan.innerText = "Tersimpan otomatis";
+                        setTimeout(() => statusSpan.innerText = "", 2000);
+                    }
+                } else {
+                    if (statusSpan) statusSpan.innerText = "Gagal auto-save!";
+                }
+
+                if (badge) {
+                    setTimeout(() => {
+                        badge.innerText = originalText;
+                        badge.style.background = "";
+                    }, 1000);
+                }
+            }, 2000);
+        }
+
+        function updateSaveButtonsUI() {
+            const globalSaveBtn = document.querySelector('.header .btn-primary');
+            const editorSaveBtn = document.querySelector('.editor-header .btn-primary');
+            
+            if (hasUnsavedChanges) {
+                if (globalSaveBtn) globalSaveBtn.innerHTML = `<i class="fas fa-save"></i> Simpan Permanen *`;
+                if (editorSaveBtn) editorSaveBtn.innerHTML = `<i class="fas fa-save"></i> Simpan Hotspots *`;
+            } else {
+                if (globalSaveBtn) globalSaveBtn.innerHTML = `<i class="fas fa-save"></i> Simpan Permanen`;
+                if (editorSaveBtn) editorSaveBtn.innerHTML = `<i class="fas fa-save"></i> Simpan Hotspots`;
+            }
+        }
+
+        function refreshEditorView() {
+            const scene = config.scenes[currentEditingId];
+            initPannellumEditor(scene);
+            renderEditorHotspotsList();
+        }
+
+        function renderEditorHotspotsList() {
+            const container = document.getElementById('editorHotspotsList');
+            container.innerHTML = '';
+            
+            const badge = document.querySelector('.mode-badge');
+            if (movingHotspotIndex !== null) {
+                badge.innerText = "Mode Pindah";
+                badge.classList.add('moving');
+            } else {
+                badge.innerText = "Hotspot Editor";
+                badge.classList.remove('moving');
+            }
+
+            tempHotspots.forEach((hs, index) => {
+                const isMoving = movingHotspotIndex === index;
+                const item = document.createElement('div');
+                item.className = `hotspot-edit-item ${isMoving ? 'moving' : ''}`;
+                
+                let content = `
+                    <div class="hs-actions">
+                        <i class="fas fa-arrows-alt hs-btn hs-move" 
+                           draggable="true" 
+                           ondragstart="handleMoveDragStart(event, ${index})"
+                           ondragend="handleMoveDragEnd()"
+                           onclick="startMoveHotspot(${index})" 
+                           title="Pindahkan (Klik atau Drag)"></i>
+                        <i class="fas fa-trash hs-btn hs-delete" onclick="removeTempHotspot(${index})" title="Hapus"></i>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <label style="font-size: 0.7rem;">Tipe Hotspot</label>
+                        <select onchange="updateTempHotspot(${index}, 'type', this.value)" style="padding: 5px; font-size: 0.8rem;">
+                            <option value="scene" ${hs.type === 'scene' ? 'selected' : ''}>Link Scene</option>
+                            <option value="info" ${hs.type === 'info' ? 'selected' : ''}>Info</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <label style="font-size: 0.7rem;">Label / Teks</label>
+                        <input type="text" value="${hs.text}" onchange="updateTempHotspot(${index}, 'text', this.value)" style="padding: 5px; font-size: 0.8rem;">
+                    </div>
+                `;
+
+                if (hs.type === 'scene') {
+                    content += `
+                        <div class="form-group" style="margin-bottom: 5px;">
+                            <label style="font-size: 0.7rem;">Target Scene ID</label>
+                            <select onchange="updateTempHotspot(${index}, 'sceneId', this.value)" style="padding: 5px; font-size: 0.8rem;">
+                                ${Object.keys(config.scenes).map(sid => `<option value="${sid}" ${sid === hs.sceneId ? 'selected' : ''}>${sid}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                } else if (hs.type === 'info') {
+                    content += `
+                        <div class="form-group" style="margin-bottom: 5px;">
+                            <label style="font-size: 0.7rem;">Teks Informasi</label>
+                            <textarea onchange="updateTempHotspot(${index}, 'infoText', this.value)" style="padding: 5px; font-size: 0.8rem; height: 100px;">${hs.infoText || ''}</textarea>
+                        </div>
+                    `;
+                }
+
+                content += `
+                    <div style="font-size: 0.7rem; color: #888;">P: ${hs.pitch} | Y: ${hs.yaw}</div>
+                    ${isMoving ? '<div style="color: var(--primary); font-size: 0.7rem; font-weight: bold; margin-top: 5px;">KLIK PADA GAMBAR UNTUK MEMINDAHKAN</div>' : ''}
+                `;
+                
+                item.innerHTML = content;
+                container.appendChild(item);
+            });
+        }
+
+        function handleMoveDragStart(e, index) {
+            isDraggingNew = true; // Use this to prevent click conflict
+            e.dataTransfer.setData('type', 'move-hotspot');
+            e.dataTransfer.setData('data', index);
+        }
+
+        // Add this to handle drag end for move icon
+        function handleMoveDragEnd() {
+            isDraggingNew = false;
+        }
+
+        function startMoveHotspot(index) {
+            movingHotspotIndex = index;
+            renderEditorHotspotsList();
+            alert("Mode Pindah Aktif: Silakan klik pada gambar panorama untuk menentukan posisi baru hotspot ini.");
+        }
+
+        function updateTempHotspot(index, key, value) {
+            if (key === 'type' && value === 'info') {
+                const hasOtherInfo = tempHotspots.some((hs, hsIndex) => hs.type === 'info' && hsIndex !== index);
+                if (hasOtherInfo) {
+                    alert('Setiap scene hanya boleh memiliki satu hotspot informasi. Pilih tipe lain atau hapus hotspot informasi yang ada terlebih dahulu.');
+                    renderEditorHotspotsList();
+                    return;
+                }
+            }
+
+            tempHotspots[index][key] = value;
+            if (key === 'type') {
+                tempHotspots[index].cssClass = value === 'info' ? 'custom-info-hotspot' : 'custom-arrow-hotspot';
+                if (value !== 'info') {
+                    tempHotspots[index].infoText = '';
+                }
+            }
+            syncTempToConfig();
+            if(key === 'text') {
+                // Optional: live update viewer without full refresh if possible, 
+                // but pannellum usually needs reload for hotspot config changes
+            }
+        }
+
+        function removeTempHotspot(index) {
+            if(confirm("Hapus hotspot ini?")) {
+                tempHotspots.splice(index, 1);
+                syncTempToConfig();
+                refreshEditorView();
+            }
+        }
+
+        async function saveEditorChanges() {
+            syncTempToConfig(); // Pastikan data terbaru di sinkron
+            const result = await saveConfigToServer();
+            if (result.success) {
+                // Notifikasi sukses sudah ada di dalam saveConfigToServer
+            }
+        }
+
+        function closeEditor() {
+            if (hasUnsavedChanges) {
+                if (!confirm("Ada perubahan yang belum disimpan secara permanen. Tetap tutup? (Perubahan masih tersimpan di memori hingga halaman direfresh)")) {
+                    return;
+                }
+            }
+            document.getElementById('editorOverlay').style.display = 'none';
+            if(panoEditorViewer) panoEditorViewer.destroy();
+            movingHotspotIndex = null;
+        }
+
+        async function deleteScene(id) {
+            if (confirm(`Hapus scene ${id}?`)) {
+                delete config.scenes[id];
+                const result = await saveConfigToServer(true);
+                if (result.success) {
+                    renderScenes();
+                    alert(`Scene ${id} berhasil dihapus secara permanen.`);
+                }
+            }
+        }
+
+        async function saveConfigToServer(silent = false) {
+            if (!checkLogin()) return { success: false };
+            const role = localStorage.getItem('cms_role') || 'client';
+            
+            if (!silent) {
+                const globalSaveBtn = document.querySelector('.header .btn-primary');
+                if (globalSaveBtn) globalSaveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
+            }
+
+            try {
+                const response = await fetch(getApiUrl('/api/save-config'), {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CMS-Auth': 'Hpalm123',
+                        'X-CMS-Role': role
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Server error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                if (result.success) {
+                    hasUnsavedChanges = false;
+                    updateSaveButtonsUI();
+                    renderScenes();
+                    if (!silent) alert("Perubahan berhasil disimpan secara permanen ke server!");
+                    return result; // Return full result including newSceneId
+                } else {
+                    throw new Error(result.message || "Gagal menyimpan data");
+                }
+            } catch (e) {
+                console.error("Save error:", e);
+                if (!silent) {
+                    alert("Gagal Menyimpan!\n\nDetail: " + e.message + "\n\nPastikan server (node server.js) berjalan.");
+                }
+                return { success: false, message: e.message };
+            } finally {
+                if (!silent) updateSaveButtonsUI();
+            }
+        }
+
+        async function exportConfig() {
+            const json = JSON.stringify(config, null, 4);
+            const output = document.getElementById('jsonOutput');
+            output.innerText = json;
+            output.style.display = 'block';
+            
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            a.click();
+            
+            alert("File config.json telah didownload. Silakan timpa file config.json lama Anda di folder proyek dengan file baru ini.");
+        }
+
+        // NAVIGATION LOGIC
+        document.getElementById('navScenes').onclick = () => {
+            document.getElementById('navScenes').classList.add('active');
+            document.getElementById('navSettings').classList.remove('active');
+            document.getElementById('scenesView').style.display = 'block';
+            document.getElementById('settingsView').style.display = 'none';
+        };
+
+        document.getElementById('navSettings').onclick = () => {
+            document.getElementById('navScenes').classList.remove('active');
+            document.getElementById('navSettings').classList.add('active');
+            document.getElementById('scenesView').style.display = 'none';
+            document.getElementById('settingsView').style.display = 'block';
+            loadSettingsToUI();
+        };
+
+        // SETTINGS LOGIC
+        function loadSettingsToUI() {
+            if (!config.settings) {
+                config.settings = {
+                    logo: {
+                        url: "foto/Logo - Harper (WHITE).png",
+                        size: 60,
+                        opacity: 100,
+                        dropShadow: true,
+                        position: "top-left",
+                        effects: []
+                    },
+                    music: { url: "", autoPlay: true },
+                    footer: { copyright: "© 2026 HARPER PALEMBANG", phone: "", reserveLink: "#", socials: [] }
+                };
+            }
+
+            // Handle backward compatibility: if logo is string, convert to object
+            if (typeof config.settings.logo === 'string') {
+                config.settings.logo = {
+                    url: config.settings.logo,
+                    size: 60,
+                    opacity: 100,
+                    dropShadow: true,
+                    position: "top-left",
+                    effects: []
+                };
+            }
+
+            // Ensure logo object has all defaults
+            if (!config.settings.logo.size) config.settings.logo.size = 60;
+            if (!config.settings.logo.opacity) config.settings.logo.opacity = 100;
+            if (!config.settings.logo.dropShadow) config.settings.logo.dropShadow = false;
+            if (!config.settings.logo.position) config.settings.logo.position = "top-left";
+            if (!config.settings.logo.effects) config.settings.logo.effects = [];
+            
+            const s = config.settings;
+            
+            // Populate First Scene Dropdown
+            const sceneSelect = document.getElementById('settingFirstScene');
+            sceneSelect.innerHTML = '';
+            for (const sid in config.scenes) {
+                const opt = document.createElement('option');
+                opt.value = sid;
+                opt.innerText = config.scenes[sid].title + ` (${sid})`;
+                if (sid === config.default.firstScene) opt.selected = true;
+                sceneSelect.appendChild(opt);
+            }
+
+            document.getElementById('musicAutoPlay').checked = s.music.autoPlay;
+            document.getElementById('musicUrlInput').value = s.music.url || "";
+            // Populate new logo settings
+            document.getElementById('logoSize').value = s.logo.size;
+            document.getElementById('logoSizeValue').innerText = s.logo.size;
+            document.getElementById('logoOpacity').value = s.logo.opacity;
+            document.getElementById('logoOpacityValue').innerText = s.logo.opacity;
+            document.getElementById('logoDropShadow').checked = s.logo.dropShadow;
+            document.getElementById('logoPosition').value = s.logo.position;
+            document.getElementById('logoEffectFadeIn').checked = s.logo.effects.includes('fadeIn');
+            document.getElementById('logoEffectHoverBlur').checked = s.logo.effects.includes('hoverBlur');
+            
+            updateLogoUI();
+            updateLogoPreview();
+            updateMusicUI();
+            
+            document.getElementById('footerCopyright').value = s.footer.copyright || "";
+            document.getElementById('footerPhone').value = s.footer.phone || "";
+            document.getElementById('footerReserveLink').value = s.footer.reserveLink || "#";
+            document.getElementById('socialInstagram').value = getFooterSocialLink('fab fa-instagram');
+            document.getElementById('socialTwitter').value = getFooterSocialLink('fab fa-twitter');
+            document.getElementById('socialFacebook').value = getFooterSocialLink('fab fa-facebook-f');
+            document.getElementById('socialTikTok').value = getFooterSocialLink('fab fa-tiktok');
+        }
+
+        async function saveSettings() {
+            const role = localStorage.getItem('cms_role') || 'client';
+            
+            // Update in-memory config
+            config.settings.music.autoPlay = document.getElementById('musicAutoPlay').checked;
+            config.settings.music.url = document.getElementById('musicUrlInput').value;
+            
+            if (role === 'admin') {
+                config.default.firstScene = document.getElementById('settingFirstScene').value;
+                config.settings.footer.copyright = document.getElementById('footerCopyright').value;
+                config.settings.footer.phone = document.getElementById('footerPhone').value;
+                config.settings.footer.reserveLink = document.getElementById('footerReserveLink').value;
+                config.settings.footer.socials = [
+                    { icon: 'fab fa-instagram', link: document.getElementById('socialInstagram').value || '' },
+                    { icon: 'fab fa-twitter', link: document.getElementById('socialTwitter').value || '' },
+                    { icon: 'fab fa-facebook-f', link: document.getElementById('socialFacebook').value || '' },
+                    { icon: 'fab fa-tiktok', link: document.getElementById('socialTikTok').value || '' }
+                ];
+
+                // Update logo settings
+                config.settings.logo.size = parseInt(document.getElementById('logoSize').value);
+                config.settings.logo.opacity = parseInt(document.getElementById('logoOpacity').value);
+                config.settings.logo.dropShadow = document.getElementById('logoDropShadow').checked;
+                config.settings.logo.position = document.getElementById('logoPosition').value;
+                config.settings.logo.effects = [];
+                if (document.getElementById('logoEffectFadeIn').checked) config.settings.logo.effects.push('fadeIn');
+                if (document.getElementById('logoEffectHoverBlur').checked) config.settings.logo.effects.push('hoverBlur');
+            }
+            
+            const result = await saveConfigToServer();
+            if (result.success) {
+                alert("Pengaturan global berhasil disimpan!");
+            }
+        }
+
+        function updateLogoUI() {
+            const logoPreview = document.getElementById('logoPreview');
+            const logoPathText = document.getElementById('logoPathText');
+            const delBtn = document.getElementById('deleteLogoBtn');
+            const logoUrl = typeof config.settings.logo === 'string' ? config.settings.logo : config.settings.logo.url;
+            
+            if (logoUrl) {
+                logoPreview.src = '../' + logoUrl;
+                logoPreview.style.display = 'block';
+                logoPathText.innerText = logoUrl;
+                if (delBtn) {
+                    delBtn.style.display = 'block';
+                    delBtn.onclick = () => deleteLogoPermanently(logoUrl, 'logo');
+                }
+            } else {
+                logoPreview.style.display = 'none';
+                logoPathText.innerText = "Belum ada logo terpilih";
+                if (delBtn) delBtn.style.display = 'none';
+            }
+        }
+
+        function updateLogoPreview() {
+            const logoPreview = document.getElementById('logoPreview');
+            const size = document.getElementById('logoSize').value;
+            const opacity = document.getElementById('logoOpacity').value;
+            const dropShadow = document.getElementById('logoDropShadow').checked;
+            
+            document.getElementById('logoSizeValue').innerText = size;
+            document.getElementById('logoOpacityValue').innerText = opacity;
+            
+            logoPreview.style.height = `${size}px`;
+            logoPreview.style.opacity = opacity / 100;
+            logoPreview.style.filter = dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
+        }
+
+        function updateMusicUI() {
+            const info = document.getElementById('currentMusicInfo');
+            const delBtn = document.getElementById('deleteMusicBtn');
+            const musicUrl = config.settings.music.url;
+            
+            if (musicUrl) {
+                info.querySelector('span').innerText = musicUrl.split('/').pop();
+                delBtn.style.display = 'block';
+                delBtn.onclick = () => deleteLogoPermanently(musicUrl, 'music');
+            } else {
+                info.querySelector('span').innerText = "Belum ada musik terpilih";
+                delBtn.style.display = 'none';
+            }
+        }
+
+        async function deleteLogoPermanently(filePath, type) {
+            if (!confirm(`Hapus ${type} ini secara permanen dari server?`)) return;
+            
+            try {
+                const response = await fetch(getApiUrl('/api/delete-file'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filePath: filePath })
+                });
+                
+                const result = await response.json();
+                if (result.success || response.status === 404) {
+                    if (type === 'logo') config.settings.logo = "";
+                    else if (type === 'music') config.settings.music.url = "";
+                    
+                    updateLogoUI();
+                    updateMusicUI();
+                    const result = await saveConfigToServer(true);
+                    if (result.success) {
+                        alert(`${type} berhasil dihapus.`);
+                    }
+                } else {
+                    alert("Gagal menghapus: " + result.message);
+                }
+            } catch (error) {
+                console.error("Delete error:", error);
+                alert("Terjadi kesalahan koneksi ke server.");
+            }
+        }
+
+        async function uploadCustomLogo() {
+            const fileInput = document.getElementById('customLogoUpload');
+            const btn = document.getElementById('customLogoUploadBtn');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Pilih file gambar logo terlebih dahulu!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('logo', fileInput.files[0]);
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                
+                const uploadUrl = getApiUrl('/api/upload-logo');
+                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+                
+                if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    config.settings.logoUrl = result.filePath;
+                    updateCustomLogoUI();
+                    await saveConfigToServer(true);
+                    alert("Custom Logo berhasil diperbarui!");
+                    fileInput.value = '';
+                } else {
+                    alert("Gagal upload custom logo: " + result.message);
+                }
+            } catch (error) {
+                console.error("Custom logo upload error:", error);
+                alert("Terjadi kesalahan koneksi ke server.\n\nDetail: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Logo';
+            }
+        }
+
+        async function deleteCustomLogo() {
+            if (!confirm("Hapus custom logo?")) return;
+            try {
+                config.settings.logoUrl = "";
+                updateCustomLogoUI();
+                await saveConfigToServer(true);
+                alert("Custom logo berhasil dihapus.");
+            } catch (error) {
+                console.error("Delete custom logo error:", error);
+                alert("Terjadi kesalahan koneksi ke server.");
+            }
+        }
+
+        function updateCustomLogoUI() {
+            const previewContainer = document.getElementById('customLogoPreviewContainer');
+            const previewImg = document.getElementById('customLogoPreview');
+            if (config.settings.logoUrl) {
+                previewImg.src = isAbsoluteUrl(config.settings.logoUrl) ? config.settings.logoUrl : config.settings.logoUrl;
+                previewContainer.style.display = 'flex';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+
+
+        async function uploadLogo() {
+            const fileInput = document.getElementById('logoUpload');
+            const btn = document.getElementById('logoUploadBtn');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Pilih file gambar logo terlebih dahulu!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('photo', fileInput.files[0]); // Using existing photo upload endpoint
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                
+                const uploadUrl = getApiUrl('/api/upload');
+                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+                
+                if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const normalizedPath = result.filePath.replace(/\\/g, '/');
+                    // Ensure config.settings.logo is an object
+                    if (typeof config.settings.logo === 'string') {
+                        config.settings.logo = {
+                            url: normalizedPath,
+                            size: 60,
+                            opacity: 100,
+                            dropShadow: true,
+                            position: "top-left",
+                            effects: []
+                        };
+                    } else {
+                        config.settings.logo.url = normalizedPath;
+                    }
+                    updateLogoUI();
+                    updateLogoPreview();
+                    await saveConfigToServer(true);
+                    alert("Logo berhasil diperbarui!");
+                    fileInput.value = '';
+                } else {
+                    alert("Gagal upload logo: " + result.message);
+                }
+            } catch (error) {
+                console.error("Logo upload error:", error);
+                alert("Terjadi kesalahan koneksi ke server.\n\nDetail: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Logo';
+            }
+        }
+
+        async function uploadMusic() {
+            const fileInput = document.getElementById('musicUpload');
+            const btn = document.getElementById('musicUploadBtn');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Pilih file musik (.mp3) terlebih dahulu!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('music', fileInput.files[0]);
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                
+                const uploadUrl = getApiUrl('/api/upload-music');
+                console.log("Fetching music upload to:", uploadUrl);
+
+                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
+                
+                if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const normalizedPath = result.filePath.replace(/\\/g, '/');
+                    config.settings.music.url = normalizedPath;
+                    document.getElementById('musicUrlInput').value = normalizedPath;
+                    updateMusicUI();
+                    // Simpan secara permanen setelah upload berhasil
+                    await saveConfigToServer(true);
+                    alert("Musik berhasil diunggah dan disimpan secara permanen!");
+                    fileInput.value = ''; // Clear input
+                } else {
+                    alert("Gagal upload: " + result.message);
+                }
+            } catch (error) {
+                console.error("Music upload error:", error);
+                alert("Terjadi kesalahan koneksi ke server.\n\nDetail: " + error.message + "\n\nPastikan 'node server.js' sudah dijalankan di terminal.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Musik';
+            }
+        }
+
+        async function deleteMusic() {
+            deleteLogoPermanently(config.settings.music.url, 'music');
+        }
+
+        function getFooterSocialLink(icon) {
+            if (!config.settings.footer.socials) return '';
+            const item = config.settings.footer.socials.find(s => s.icon === icon);
+            return item ? item.link : '';
+        }
+
+        loadConfig();
+    </script>
+</body>
+</html>

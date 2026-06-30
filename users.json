@@ -1,0 +1,25 @@
+{
+    "users": [
+        {
+            "id": "1",
+            "username": "admin",
+            "password": "Hpalm123",
+            "role": "admin",
+            "createdAt": "2024-01-01T00:00:00.000Z"
+        },
+        {
+            "id": "2",
+            "username": "client",
+            "password": "Harper360",
+            "role": "user",
+            "createdAt": "2024-01-01T00:00:00.000Z"
+        },
+        {
+            "id": "1782107226405",
+            "username": "test",
+            "password": "test",
+            "role": "user",
+            "createdAt": "2026-06-22T05:47:06.405Z"
+        }
+    ]
+}

@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Harper Palembang - Virtual Tour 360° Interaktif</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Pannellum Library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary: #C8A96A;
+            --primary-light: #d4bb8a;
+            --primary-dark: #a88a4d;
+            --bg-dark: #0d0d0d;
+            --bg-card: rgba(17, 17, 17, 0.75);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: rgba(200, 169, 106, 0.3);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 20px rgba(200, 169, 106, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            overflow: hidden;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Luxury Cursor */
+        body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="27" viewBox="0 0 24 27"><polygon points="2,2 22,13 12,13 10,25" fill="%23C8A96A" stroke="%23111" stroke-width="1.5"/><circle cx="12" cy="12" r="2" fill="white"/></svg>') 12 5, auto;
+        }
+
+        /* Loading Progress */
+        #loading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--primary-light));
+            z-index: 10000;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--glow);
+        }
+
+        /* Glassmorphism Utility */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+        }
+
+        /* Logo Overlay */
+        .logo-overlay {
+            position: fixed;
+            top: 0.75rem;
+            left: 2rem;
+            z-index: 900;
+            pointer-events: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .logo-overlay img {
+            width: auto;
+            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
+            transition: all 0.3s ease;
+        }
+
+        .logo-overlay img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 4px 24px rgba(200,169,106,0.4));
+        }
+
+        #left-branding-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100000;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            align-items: flex-start;
+            max-width: min(320px, 90vw);
+        }
+
+        #custom-logo,
+        #info-popup-panel.show {
+            pointer-events: auto;
+        }
+
+        #custom-logo {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        #info-popup-panel {
+            position: absolute;
+            top: 105px;
+            left: 0;
+            width: 100%;
+            max-height: min(420px, 55vh);
+            overflow-y: auto;
+            overflow-wrap: anywhere;
+            word-wrap: break-word;
+            word-break: break-word;
+            background: rgba(17, 17, 17, 0.82);
+            border: 1px solid rgba(200, 169, 106, 0.25);
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        #info-popup-panel.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        #info-popup-panel h3 {
+            margin: 0 0 0.75rem 0;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+        }
+
+        .info-divider {
+            width: 44px;
+            height: 4px;
+            border-radius: 999px;
+            background: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        #info-popup-panel p {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-size: 0.95rem;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .hotspot-info-popup {
+            position: fixed;
+            border-radius: 28px;
+            padding: 1.5rem;
+            background: rgba(15, 15, 15, 0.88);
+            border: 1px solid rgba(200, 169, 106, 0.35);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            width: min(360px, calc(100vw - 2rem));
+            max-width: 360px;
+            color: #fff;
+        }
+
+        .hotspot-info-popup .hotspot-info-logo {
+            display: block;
+            width: 120px;
+            max-width: 100%;
+            margin: 0 auto 1rem;
+        }
+
+        .hotspot-info-popup .hotspot-info-inner {
+            position: relative;
+            padding: 1rem 0 0;
+            text-align: center;
+        }
+
+        .hotspot-info-popup .hotspot-info-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(200, 169, 106, 0.35);
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+
+        .hotspot-info-popup h3 {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .hotspot-info-popup .hotspot-info-body {
+            text-align: left;
+            margin-top: 0.5rem;
+            line-height: 1.7;
+            color: #d5d5d5;
+        }
+
+        .hotspot-info-popup .hotspot-info-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .hotspot-info-popup .hotspot-info-row strong {
+            display: block;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .hotspot-info-popup .hotspot-info-row span {
+            color: #c8c8c8;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Container utama - Biarkan diatur sepenuhnya oleh Pannellum */ 
+        .custom-arrow-hotspot, 
+        .custom-info-hotspot { 
+            width: 40px !important;
+            height: 40px !important;
+            cursor: pointer; 
+            z-index: 50; 
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        } 
+ 
+        /* Elemen dalam yang menampung gambar ikon dan animasi untuk SCENE LINK HOTSPOT */ 
+        .custom-arrow-hotspot::after { 
+            content: ""; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803810/WhatsApp_Image_2026-06-30_at_13.46.54_qsub6b.jpg');
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            animation: hotspotPulse 2s infinite ease-in-out; 
+            transition: transform 0.2s ease, filter 0.2s ease; 
+        } 
+
+        /* Elemen dalam yang menampung gambar ikon dan animasi untuk INFO HOTSPOT */ 
+        .custom-info-hotspot::after { 
+            content: ""; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803810/WhatsApp_Image_2026-06-30_at_13.46.55_cemmzk.jpg');
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            animation: hotspotPulse 2s infinite ease-in-out; 
+            transition: transform 0.2s ease, filter 0.2s ease; 
+        } 
+ 
+        /* Efek hover untuk SCENE LINK HOTSPOT */ 
+        .custom-arrow-hotspot:hover::after { 
+            transform: scale(1.15); 
+            filter: drop-shadow(0px 0px 8px rgba(212, 175, 55, 0.8)); 
+        } 
+
+        /* Efek hover untuk INFO HOTSPOT */ 
+        .custom-info-hotspot:hover::after { 
+            transform: scale(1.15); 
+            filter: drop-shadow(0px 0px 8px rgba(30, 144, 255, 0.8)); 
+        } 
+ 
+        /* Animasi denyut baru yang aman (hanya mengubah skala visual elemen dalam) */ 
+        @keyframes hotspotPulse { 
+            0% { 
+                transform: scale(1); 
+                opacity: 0.9; 
+            } 
+            50% { 
+                transform: scale(1.1); 
+                opacity: 1; 
+                filter: drop-shadow(0px 0px 6px rgba(30, 144, 255, 0.5)); 
+            } 
+            100% { 
+                transform: scale(1); 
+                opacity: 0.9; 
+            } 
+        }
+
+        /* Override Pannellum's default hotspot bg */
+        .custom-arrow-hotspot.pnlm-hotspot,
+        .custom-info-hotspot.pnlm-hotspot {
+            background-color: transparent !important;
+        }
+
+        /* Menyembunyikan container judul bawaan Pannellum */ 
+        .pnlm-title-box { 
+            display: none !important; 
+        } 
+        
+        /* Invisible Trigger Zones */
+        .trigger-zone {
+            position: fixed;
+            background: transparent; /* Hide the debug red overlay */
+            z-index: 100; /* Low z-index so it doesn't block modal */
+            pointer-events: auto;
+        }
+        .trigger-bottom {
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+        }
+        .trigger-right {
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 60px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -340px;
+            width: 320px;
+            height: 100vh;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1100;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-right: 1px solid var(--border);
+            padding: 6rem 1.5rem 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .sidebar.open {
+            transform: translateX(340px);
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-sidebar:hover {
+            color: var(--primary);
+            background: rgba(200,169,106,0.1);
+            transform: rotate(90deg);
+        }
+
+        .sidebar h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .scene-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .scene-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
+        }
+
+        .scene-item i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            width: 32px;
+            text-align: center;
+        }
+
+        .scene-item span {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .scene-item:hover {
+            background: rgba(200,169,106,0.08);
+            border-color: rgba(200,169,106,0.3);
+            transform: translateX(8px);
+        }
+
+        .scene-item.active {
+            background: linear-gradient(135deg, rgba(200,169,106,0.2), rgba(200,169,106,0.05));
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        /* Control Panel */
+        .controls-panel {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 9999;
+            transform: translateX(80%);
+            transition: transform 0.3s ease-in-out;
+            padding-right: 1.5rem; /* Extra padding to make hover area bigger */
+        }
+        .controls-panel::before {
+            content: "";
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            background: transparent;
+        }
+        .controls-panel:hover, .controls-panel.mobile-open {
+            transform: translateX(0) !important;
+        }
+
+        .ctrl-btn {
+            width: 54px;
+            height: 54px;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .ctrl-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            transform: scale(1.12);
+            box-shadow: 0 8px 28px rgba(200,169,106,0.4);
+            border-color: transparent;
+        }
+
+        .ctrl-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Mini Map Navigation */
+        .mini-map {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(85%);
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px 50px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            display: flex;
+            gap: 1rem;
+            z-index: 9999;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease-in-out;
+            padding-top: 1.5rem; /* Extra top padding to make the visible area bigger for hover/tap */
+        }
+        .mini-map::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: transparent;
+        }
+        .mini-map:hover, .mini-map.mobile-open {
+            transform: translateX(-50%) translateY(0) !important;
+        }
+
+        .mini-map span {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            color: var(--text-secondary);
+        }
+
+        .mini-map span:hover {
+            color: var(--text-primary);
+            background: rgba(200,169,106,0.1);
+        }
+
+        .mini-map span.active-map {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: var(--glow);
+        }
+
+        .mini-map .admin-sep {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            align-self: center;
+        }
+
+        .mini-map .admin-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .mini-map .admin-link:hover {
+            color: var(--text-primary);
+            background: rgba(200,169,106,0.1);
+            transform: scale(1.1);
+        }
+
+        /* Music Control */
+        .music-ctrl {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 1001;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Book Now Button */
+        .book-now-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 2px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .book-now-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(200,169,106,0.5);
+            background: var(--text-primary);
+            border-color: var(--primary);
+        }
+
+        .book-now-btn:active {
+            transform: translateY(-2px);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            position: fixed;
+            top: 50%;
+            right: -380px;
+            transform: translateY(-50%);
+            width: 360px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px 0 0 20px;
+            border: 1px solid var(--border);
+            border-right: none;
+            padding: 2rem;
+            z-index: 1050;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .info-panel.open {
+            transform: translate(-380px, -50%);
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-header h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .close-info {
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-info:hover {
+            color: var(--primary);
+            background: rgba(200,169,106,0.1);
+        }
+
+        .info-panel img {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .info-desc {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .pnlm-compass {
+            position: fixed !important;
+            left: 1.5rem !important;
+            bottom: 1.5rem !important;
+            top: auto !important;
+            right: auto !important;
+            width: 48px !important;
+            height: 48px !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            padding: 0 !important;
+            transform-origin: center center !important;
+        }
+
+        .footer {
+            display: none;
+        }
+
+        #footerSocialTray {
+            position: fixed;
+            right: 3rem;
+            bottom: 1rem;
+            z-index: 9998;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            align-items: center;
+            justify-content: center;
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid rgba(200, 169, 106, 0.2);
+            border-radius: 999px;
+            padding: 0.35rem 0.5rem;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            max-width: calc(100vw - 3rem);
+        }
+
+        #footerCopyrightDisplay {
+            position: fixed;
+            left: 1.5rem;
+            bottom: 5.4rem;
+            z-index: 9999;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+            font-size: 0.85rem;
+            line-height: 1.4;
+            max-width: 100%;
+            pointer-events: none;
+            text-align: left;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 768px) {
+            #footerSocialTray {
+                bottom: 6.5rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+
+            #footerCopyrightDisplay {
+                bottom: 7.8rem;
+                left: 1rem;
+                max-width: 100%;
+                font-size: 0.80rem;
+            }
+        }
+
+        .footer-social-link {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            text-decoration: none;
+            color: var(--primary);
+            background: transparent;
+            transition: all 0.25s ease;
+            font-size: 1rem;
+        }
+
+        .footer-social-link:hover {
+            transform: translateY(-1px);
+            background: transparent;
+        }
+
+        .footer-social-link.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        @media (max-width: 768px) {
+            #footerSocialTray {
+                bottom: 6.5rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+        }
+
+        .social-icons a:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Panorama Container */
+        #panorama {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Toggle Sidebar Button */
+        .toggle-sidebar {
+            position: fixed;
+            top: 1.5rem;
+            left: 2rem;
+            z-index: 1001;
+            font-size: 1.8rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .toggle-sidebar:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            transform: scale(1.1);
+        }
+
+        /* Hotspot Styles */
+        .pnlm-hotspot {
+            width: 28px !important;
+            height: 28px !important;
+            background: radial-gradient(circle, var(--primary) 0%, rgba(200,169,106,0.3) 60%, transparent 100%);
+            border-radius: 50%;
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 0 rgba(200,169,106, 0.7);
+        }
+
+        .pnlm-hotspot:hover {
+            transform: scale(1.4);
+            animation-play-state: paused;
+            box-shadow: 0 0 0 12px rgba(200,169,106, 0);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(200,169,106, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 16px rgba(200,169,106, 0);
+            }
+        }
+
+        .custom-tooltip {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            pointer-events: none;
+            box-shadow: var(--shadow-soft);
+            animation: fade-in-up 0.3s ease;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hide Default Pannellum Tooltip */
+        .pnlm-hotspot span {
+            display: none !important;
+        }
+        .pnlm-tooltip span {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .controls-panel {
+                bottom: 1rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+
+            .ctrl-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.3rem;
+            }
+
+            .mini-map {
+                display: none;
+            }
+
+            .book-now-btn {
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 2rem);
+                justify-content: center;
+            }
+
+            .book-now-btn:hover {
+                transform: translateX(-50%) translateY(-4px);
+            }
+
+            .info-panel {
+                width: calc(100% - 2rem);
+                top: auto;
+                bottom: 0;
+                right: -100%;
+                transform: translateY(0);
+                border-radius: 20px 20px 0 0;
+                border: 1px solid var(--border);
+                border-bottom: none;
+                padding: 1.5rem;
+            }
+
+            .info-panel.open {
+                transform: translateY(0);
+                right: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            .sidebar.open {
+                transform: translateX(100%);
+            }
+
+            .logo-overlay {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.5rem 1rem;
+            }
+            .logo-overlay img {
+                height: 45px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Welcome Modal -->
+<div id="welcomeModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+    <div style="text-align: center; max-width: 500px; padding: 2rem; border: 1px solid #C8A96A; border-radius: 20px; background: rgba(17,17,17,0.8);">
+        <h1 style="font-family: 'Playfair Display', serif; color: #C8A96A; margin-bottom: 1rem;">Selamat Datang</h1>
+        <p style="margin-bottom: 2rem; line-height: 1.6;">Nikmati pengalaman Virtual Tour 360° di Harper Palembang. Jelajahi setiap sudut kenyamanan kami.</p>
+        <button id="startTourBtn" style="padding: 12px 30px; background: #C8A96A; border: none; border-radius: 30px; color: #111; font-weight: 600; cursor: pointer; transition: 0.3s;">Mulai Jelajah</button>
+    </div>
+</div>
+
+<div id="loading-progress"></div>
+<div class="toggle-sidebar" id="toggleSidebarBtn"><i class="fas fa-bars"></i></div>
+
+<div class="music-ctrl">
+    <div class="ctrl-btn" id="musicBtn" title="Play/Pause Ambience"><i class="fas fa-music"></i></div>
+</div>
+
+<!-- Invisible Trigger Zones -->
+<div id="miniMapTrigger" class="trigger-zone trigger-bottom"></div>
+<div id="controlsPanelTrigger" class="trigger-zone trigger-right"></div>
+
+
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></div>
+    <h3 style="color:#C8A96A; margin-bottom: 1rem;"><i class="fas fa-map-marked-alt"></i> Explore Harper</h3>
+    <div class="scene-list" id="sceneList"></div>
+</div>
+
+<!-- Info Panel -->
+<div class="info-panel" id="infoPanel">
+    <div class="info-header">
+        <h3 id="infoTitle">Harper Lobby</h3>
+        <div class="close-info" id="closeInfo"><i class="fas fa-times-circle"></i></div>
+    </div>
+    <img id="infoImage" src="foto/Lobby New.jpeg" alt="scene preview">
+    <p class="info-desc" id="infoDesc">Experience elegance and warm welcome at Harper Palembang Lobby, with modern design and cozy atmosphere.</p>
+</div>
+
+<!-- Control Buttons + MiniMap -->
+<div class="controls-panel">
+    <div class="ctrl-btn" id="homeBtn" title="Kembali ke Halaman Utama"><i class="fas fa-home"></i></div>
+    <div class="ctrl-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></div>
+    <div class="ctrl-btn" id="zoomInBtn"><i class="fas fa-search-plus"></i></div>
+    <div class="ctrl-btn" id="zoomOutBtn"><i class="fas fa-search-minus"></i></div>
+    <div class="ctrl-btn" id="resetViewBtn"><i class="fas fa-sync-alt"></i></div>
+    <div class="ctrl-btn" id="autoRotateBtn"><i class="fas fa-redo-alt"></i></div>
+    <div class="ctrl-btn" id="hotspotHelperBtn" title="Ambil Koordinat Hotspot"><i class="fas fa-crosshairs"></i></div>
+</div>
+
+<!-- Hotspot Coordinate Display -->
+<div id="coordinatePopup" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #C8A96A; padding: 15px 25px; border-radius: 12px; border: 1px solid #C8A96A; z-index: 10001; font-family: 'Poppins', sans-serif; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h4 style="margin-bottom: 10px; font-family: 'Playfair Display', serif;">Koordinat Terdeteksi</h4>
+    <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 12px; font-family: monospace; font-size: 0.9rem;">
+        Pitch: <span id="coordPitch">0</span> | Yaw: <span id="coordYaw">0</span>
+    </div>
+    <button id="copyCoordsBtn" style="background: #C8A96A; border: none; padding: 5px 15px; border-radius: 4px; color: #111; font-weight: 600; cursor: pointer; margin-right: 10px;">Salin JSON</button>
+    <button id="closeCoordPopup" style="background: transparent; border: 1px solid #666; padding: 5px 15px; border-radius: 4px; color: #fff; cursor: pointer;">Tutup</button>
+</div>
+<div class="mini-map" id="miniMap">
+    <span data-scene="exterior" class="active-map">🏢 Exterior</span>
+    <span data-scene="lobby">🏨 Lobby</span>
+    <span data-scene="floor_3">🏢 Floor 3</span>
+    <span data-scene="pool_area">🏊 Pool</span>
+    <span data-scene="room">🛌 Rooms</span>
+    <div class="admin-sep"></div>
+    <a href="admin/login.html" class="admin-link" title="Admin Login"><i class="fas fa-user-shield"></i></a>
+</div>
+
+<div id="left-branding-panel">
+    <img id="custom-logo" src="" alt="Harper Hotel Logo">
+    <div id="info-popup-panel">
+        <h3 id="info-panel-title">Nama Ruangan</h3>
+        <div class="info-divider"></div>
+        <p id="info-panel-desc">Deskripsi informasi.</p>
+    </div>
+</div>
+
+<div class="logo-overlay">
+    <img id="mainLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo">
+</div>
+
+<div id="panorama"></div>
+
+<a href="#" class="book-now-btn" id="bookNowBtn">
+    <i class="fas fa-calendar-check"></i> RESERVASI SEKARANG
+</a>
+
+<div id="footerSocialTray"></div>
+<div id="footerCopyrightDisplay"></div>
+
+<script>
+    // --- FETCH CONFIGURATION ---
+    let tourConfig = null;
+
+    async function initTour() {
+        try {
+            let response = await fetch('/api/config?v=' + Date.now());
+            if (response.ok) {
+                tourConfig = await response.json();
+            } else {
+                // Fallback ke config.json jika API gagal
+                response = await fetch('config.json?v=' + Date.now());
+                tourConfig = await response.json();
+            }
+            
+            // Update Custom Logo (fixed position/size)
+            const customLogo = document.getElementById('custom-logo');
+            if (tourConfig.settings && tourConfig.settings.logoUrl) {
+                customLogo.src = isAbsoluteUrl(tourConfig.settings.logoUrl) ? tourConfig.settings.logoUrl : tourConfig.settings.logoUrl;
+                customLogo.style.display = 'block';
+            } else {
+                customLogo.style.display = 'none';
+            }
+
+            // Update Logo from config
+            const logoOverlay = document.querySelector('.logo-overlay');
+            const mainLogo = document.getElementById('mainLogo');
+            let logoUrl = null;
+            let logoSettings = {
+                size: 60,
+                opacity: 100,
+                dropShadow: true,
+                position: "top-left",
+                effects: []
+            };
+
+            if (tourConfig.settings) {
+                if (typeof tourConfig.settings.logo === 'string') {
+                    logoUrl = tourConfig.settings.logo;
+                } else if (typeof tourConfig.settings.logo === 'object' && tourConfig.settings.logo.url) {
+                    logoUrl = tourConfig.settings.logo.url;
+                    logoSettings = { ...logoSettings, ...tourConfig.settings.logo };
+                }
+            }
+            
+            if (logoUrl && mainLogo) {
+                mainLogo.src = isAbsoluteUrl(logoUrl) ? logoUrl : logoUrl;
+                logoOverlay.style.display = 'flex';
+                mainLogo.style.height = `${logoSettings.size}px`;
+                mainLogo.style.opacity = logoSettings.opacity / 100;
+                mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
+
+                // Apply position (tetap mempertahankan styling glassmorphism)
+                logoOverlay.style.top = '2rem';
+                logoOverlay.style.left = 'auto';
+                logoOverlay.style.right = 'auto';
+                logoOverlay.style.transform = 'none';
+                switch (logoSettings.position) {
+                    case 'top-left':
+                        logoOverlay.style.left = '2rem';
+                        logoOverlay.style.right = 'auto';
+                        logoOverlay.style.transform = 'none';
+                        break;
+                    case 'top-center':
+                        logoOverlay.style.left = '50%';
+                        logoOverlay.style.right = 'auto';
+                        logoOverlay.style.transform = 'translateX(-50%)';
+                        break;
+                    case 'top-right':
+                        logoOverlay.style.right = '2rem';
+                        logoOverlay.style.left = 'auto';
+                        logoOverlay.style.transform = 'none';
+                        break;
+                }
+
+                // Apply effects
+                if (logoSettings.effects.includes('fadeIn')) {
+                    mainLogo.style.opacity = '0';
+                    mainLogo.style.transition = 'opacity 1s ease-in-out';
+                    setTimeout(() => {
+                        mainLogo.style.opacity = logoSettings.opacity / 100;
+                    }, 100);
+                }
+                if (logoSettings.effects.includes('hoverBlur')) {
+                    mainLogo.style.transition = mainLogo.style.transition ? mainLogo.style.transition + ', filter 0.3s' : 'filter 0.3s';
+                    mainLogo.addEventListener('mouseenter', () => {
+                        mainLogo.style.filter = (logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : '') + ' blur(2px)';
+                    });
+                    mainLogo.addEventListener('mouseleave', () => {
+                        mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
+                    });
+                }
+            } else {
+                if (logoOverlay) logoOverlay.style.display = 'none';
+            }
+
+            // Update Music from config (disabled for now to use the new URL)
+            // if (tourConfig.settings && tourConfig.settings.music && tourConfig.settings.music.url) {
+            //     bgMusic.src = tourConfig.settings.music.url;
+            //     bgMusic.load();
+            // }
+            
+            // Build Sidebar List
+            buildSidebar();
+            renderFooterSocialTray();
+            renderFooterCopyright();
+            
+            // Initial load
+            loadScene(tourConfig.default.firstScene);
+            
+            console.log("Virtual Tour 360° Harper Palembang Siap");
+        } catch (error) {
+            console.error("Gagal memuat konfigurasi tour:", error);
+            // Fallback atau pesan error ke user
+        }
+    }
+
+    let panoViewer = null;
+    let currentSceneId = "lobby";
+    let autoRotateActive = true;
+    let exteriorIntroRequested = false;
+    let exteriorIntroRan = false;
+    let bgMusic = new Audio('https://res.cloudinary.com/dcsvtyhhe/video/upload/v1782803793/The_Golden_Meridian_feute1.mp3'); // Smooth background jazz
+    bgMusic.loop = true;
+    bgMusic.volume = 0.2;
+    bgMusic.addEventListener('error', (e) => {
+        console.warn("Audio file could not be loaded. Please check the URL or your internet connection.");
+    });
+    bgMusic.addEventListener('canplaythrough', () => {
+        console.log("Audio siap diputar");
+    });
+
+    function runExteriorIntro() {
+        if (!panoViewer || currentSceneId !== 'exterior' || exteriorIntroRan || !exteriorIntroRequested) return;
+        exteriorIntroRan = true;
+
+        // Keep the initial exterior view unchanged so the camera does not jump to the HARPER text area.
+    }
+
+    // Fungsi load scene dengan smooth transition
+    function loadScene(sceneId, fade=true) {
+        if (!tourConfig.scenes[sceneId]) return;
+        const scene = tourConfig.scenes[sceneId];
+        currentSceneId = sceneId;
+        
+        // update sidebar active class
+        document.querySelectorAll('.scene-item').forEach(el => {
+            if(el.dataset.scene === sceneId) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+        
+        // update mini map active class
+        document.querySelectorAll('.mini-map span').forEach(el => {
+            if(el.dataset.scene === sceneId) el.classList.add('active-map');
+            else el.classList.remove('active-map');
+        });
+
+        // Show loading progress bar
+        let progressBar = document.getElementById('loading-progress');
+        progressBar.style.width = "30%";
+        
+        if(panoViewer) {
+            panoViewer.loadScene(sceneId);
+        } else {
+            // Helper to check if URL is absolute
+            const isAbsoluteUrl = (url) => url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+            
+            // Prepare scenes with correct paths and custom hotspot class
+            const processedScenes = {};
+            for (const id in tourConfig.scenes) {
+                const scene = { ...tourConfig.scenes[id] };
+                
+                // Process hotspots if any
+                if (scene.hotSpots && Array.isArray(scene.hotSpots)) {
+                    scene.hotSpots = scene.hotSpots.map((hs, index) => {
+                        const processedHs = {
+                            ...hs,
+                            cssClass: hs.type === 'info' ? 'custom-info-hotspot' : 'custom-arrow-hotspot'
+                        };
+
+                                if (hs.type === 'info') {
+                            processedHs.tooltip = hs.text || hs.infoText || 'Info';
+                            processedHs.createTooltipFunc = function(el) {
+                                el.classList.add('custom-hotspot-tooltip');
+                                el.style.cursor = 'pointer';
+                                el.style.pointerEvents = 'auto';
+                                el.dataset.hotspotTitle = hs.text || 'Info';
+                                el.dataset.hotspotInfoText = hs.infoText || '';
+                                el.dataset.infoClickBound = 'true';
+                                el.addEventListener('click', function(event) {
+                                    console.log('Info hotspot clicked', hs.text, hs.infoText, el);
+                                    event.stopPropagation();
+                                    event.preventDefault();
+                                    showHotspotInfoPopup(el.dataset.hotspotTitle, el.dataset.hotspotInfoText, el);
+                                });
+                                return el;
+                            };
+                            processedHs.clickHandlerFunc = function(event, args) {
+                                console.log('Info hotspot clicked', hs.text, hs.infoText);
+                                const infoPanel = document.getElementById('info-popup-panel');
+                                const infoPanelTitle = document.getElementById('info-panel-title');
+                                const infoPanelDesc = document.getElementById('info-panel-desc');
+                                
+                                if (infoPanel && infoPanelTitle && infoPanelDesc) {
+                                    infoPanelTitle.innerText = hs.text || 'Informasi';
+                                    infoPanelDesc.innerText = hs.infoText || '';
+                                    infoPanel.classList.toggle('show');
+                                }
+                                
+                                if (event && typeof event.stopPropagation === 'function') {
+                                    event.stopPropagation();
+                                    event.preventDefault();
+                                }
+                            };
+                        }
+
+                        return processedHs;
+                    });
+                }
+                
+                scene.panorama = isAbsoluteUrl(scene.panorama) ? 
+                                  scene.panorama : 
+                                  '/' + scene.panorama;
+                
+                processedScenes[id] = scene;
+                // Update tourConfig.scenes so loadScene also works
+                tourConfig.scenes[id] = scene;
+            }
+
+            // initial viewer setup with multi-scene support
+            panoViewer = pannellum.viewer('panorama', {
+                "default": {
+                    ...tourConfig.default,
+                    firstScene: sceneId // Ensure we start at the requested scene
+                },
+                "scenes": processedScenes,
+                "autoLoad": true,
+                "autoRotate": -2,
+                "autoRotateInactivity": 3000,
+                "showZoomCtrl": false,
+                "showFullscreenCtrl": false,
+                "compass": true,
+                "gyroscope": true,
+                "hotSpotDebug": false,
+                "minHfov": 50,
+                "maxHfov": 120,
+                "backgroundColor": [0.1, 0.1, 0.1]
+            });
+
+            // Handle errors
+            panoViewer.on('error', (err) => {
+                console.error("Pannellum Error:", err);
+                if (err.type === 'webgl') {
+                    alert("Browser Anda tidak mendukung WebGL atau terjadi masalah saat memuat grafis panorama.");
+                } else {
+                    console.warn("Pannellum load warning:", err.message);
+                }
+            });
+
+            panoViewer.on('load', () => {
+                if (currentSceneId === 'exterior' && exteriorIntroRequested && !exteriorIntroRan) {
+                    runExteriorIntro();
+                }
+            });
+
+            function attachInfoHotspotClickHandlers() {
+                document.querySelectorAll('.custom-info-hotspot').forEach(el => {
+                    if (el.dataset.infoClickBound === 'true') return;
+                    el.dataset.infoClickBound = 'true';
+                    el.style.cursor = 'pointer';
+                    el.style.pointerEvents = 'auto';
+                    const title = el.dataset.hotspotTitle || el.dataset.tooltip || 'Info';
+                    const text = el.dataset.hotspotInfoText || el.dataset.tooltip || '';
+                    el.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        showHotspotInfoPopup(title, text, el);
+                    });
+                });
+            }
+
+            // Handle custom click handlers for info hotspots
+            panoViewer.on('scenechange', (newSceneId) => {
+                currentSceneId = newSceneId;
+                updateActiveUI(newSceneId);
+                const sceneData = tourConfig.scenes[newSceneId];
+                if(sceneData) updateInfoPreview(sceneData.title, sceneData.description, sceneData.previewImg);
+                
+                // Handle Info Scene
+                const infoPanel = document.getElementById('info-popup-panel');
+                const hasInfoHotspot = Array.isArray(sceneData.hotSpots) && sceneData.hotSpots.some(hs => hs.type === 'info');
+                if (!hasInfoHotspot) {
+                    infoPanel.classList.remove('show');
+                }
+                
+                progressBar.style.width = "100%";
+                setTimeout(()=> progressBar.style.width = "0%", 500);
+            });
+        }
+        
+        updateInfoPreview(scene.title, scene.description, scene.previewImg);
+        
+        // Handle Info Scene for initial load
+        const infoPanel = document.getElementById('info-popup-panel');
+        const hasInfoHotspot = Array.isArray(scene.hotSpots) && scene.hotSpots.some(hs => hs.type === 'info');
+        if (!hasInfoHotspot) {
+            infoPanel.classList.remove('show');
+        }
+        
+        progressBar.style.width = "100%";
+        setTimeout(()=> progressBar.style.width = "0%", 800);
+    }
+
+    function updateActiveUI(sceneId) {
+        document.querySelectorAll('.scene-item').forEach(el => {
+            if(el.dataset.scene === sceneId) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+        document.querySelectorAll('.mini-map span').forEach(el => {
+            if(el.dataset.scene === sceneId) el.classList.add('active-map');
+            else el.classList.remove('active-map');
+        });
+    }
+
+    // Helper to check if URL is absolute
+        const isAbsoluteUrl = (url) => url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+
+        function showInfoPanel(title, infoText, imgUrl) {
+            document.getElementById('infoTitle').innerText = title;
+            document.getElementById('infoDesc').innerText = infoText;
+            document.getElementById('infoImage').src = (imgUrl && isAbsoluteUrl(imgUrl)) ? imgUrl : (imgUrl || "foto/LOBBY.png");
+            document.getElementById('infoPanel').classList.add('open');
+        }
+
+        function getSceneInfoData(scene) {
+            if (!scene) return { title: '', text: '', imgUrl: '' };
+            const infoHotspot = Array.isArray(scene.hotSpots) ? scene.hotSpots.find(hs => hs.type === 'info') : null;
+            const infoText = infoHotspot?.infoText?.trim() || scene.infoText?.trim() || '';
+            return {
+                title: infoHotspot?.text || scene.title || 'Informasi',
+                text: infoText,
+                imgUrl: scene.previewImg || scene.panorama || ''
+            };
+        }
+
+        function updateInfoPreview(title, desc, imgUrl) {
+            document.getElementById('infoTitle').innerText = title;
+            document.getElementById('infoDesc').innerText = desc;
+            if(imgUrl) document.getElementById('infoImage').src = isAbsoluteUrl(imgUrl) ? imgUrl : imgUrl;
+        }
+
+        function buildSocialLinkUrl(rawValue) {
+            if (!rawValue) return '';
+            const trimmed = rawValue.trim();
+            if (/^https?:\/\//i.test(trimmed)) return trimmed;
+            const digits = trimmed.replace(/[^0-9+]/g, '');
+            if (digits.length >= 7) {
+                const cleaned = digits.replace(/^\+/, '');
+                return `https://wa.me/${cleaned}`;
+            }
+            return '';
+        }
+
+        function getFooterSocialLink(icon) {
+            if (!tourConfig || !tourConfig.settings || !tourConfig.settings.footer) return '';
+            const socials = Array.isArray(tourConfig.settings.footer.socials) ? tourConfig.settings.footer.socials : [];
+            const item = socials.find(s => s.icon === icon);
+            return item ? (item.link || '') : '';
+        }
+
+        function renderFooterSocialTray() {
+            const tray = document.getElementById('footerSocialTray');
+            if (!tray || !tourConfig || !tourConfig.settings || !tourConfig.settings.footer) return;
+
+            const socials = [
+                { key: 'instagram', icon: 'fab fa-instagram', label: 'Instagram', link: getFooterSocialLink('fab fa-instagram') },
+                { key: 'twitter', icon: 'fab fa-twitter', label: 'Twitter', link: getFooterSocialLink('fab fa-twitter') },
+                { key: 'facebook', icon: 'fab fa-facebook-f', label: 'Facebook', link: getFooterSocialLink('fab fa-facebook-f') },
+                { key: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok', link: getFooterSocialLink('fab fa-tiktok') },
+                { key: 'whatsapp', icon: 'fab fa-whatsapp', label: 'WhatsApp', link: buildSocialLinkUrl(tourConfig.settings.footer.phone || '') },
+                { key: 'reserve', icon: 'fas fa-link', label: 'Reservasi Hotel', link: (tourConfig.settings.footer.reserveLink || '').trim() }
+            ];
+
+            tray.innerHTML = socials.map(item => {
+                const valid = item.link && item.link !== '#';
+                const hrefAttr = valid ? `href="${item.link}" target="_blank" rel="noopener noreferrer"` : '';
+                const disabledClass = valid ? '' : ' disabled';
+                return `
+                    <a class="footer-social-link${disabledClass}" aria-label="${item.label}" ${hrefAttr}>
+                        <i class="${item.icon}"></i>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function renderFooterCopyright() {
+            const el = document.getElementById('footerCopyrightDisplay');
+            if (!el || !tourConfig || !tourConfig.settings) return;
+            const copyrightText = (tourConfig.settings.footer && tourConfig.settings.footer.copyright) ? tourConfig.settings.footer.copyright.trim() : '';
+            if (!copyrightText) {
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = 'block';
+            el.innerText = copyrightText;
+        }
+
+        function positionInfoIcon() {
+            // No-op: left branding panel is positioned statically in the top-left.
+        }
+
+        window.addEventListener('resize', positionInfoIcon);
+
+        // Show popup for info hotspot
+        let hotspotInfoPopup = null;
+        function showHotspotInfoPopup(title, text, anchorElement = null) {
+            // Remove existing popup if any
+            if (hotspotInfoPopup) {
+                hotspotInfoPopup.remove();
+            }
+
+            const infoLogoUrl = 'https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782717434/harper-360/logos/lgdiyyucw8c3kdgnx31d.png';
+            const rows = text
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .map(line => {
+                    if (line.includes(':')) {
+                        const [key, ...rest] = line.split(':');
+                        return { label: key.trim(), value: rest.join(':').trim() };
+                    }
+                    return null;
+                })
+                .filter(item => item !== null);
+
+            const content = rows.length > 0
+                ? rows.map(row => `
+                    <div class="hotspot-info-row">
+                        <strong>${row.label}</strong>
+                        <span>${row.value}</span>
+                    </div>
+                `).join('')
+                : `<div class="hotspot-info-body">${text.replace(/\n/g, '<br>')}</div>`;
+
+            // Create popup
+            hotspotInfoPopup = document.createElement('div');
+            hotspotInfoPopup.className = 'hotspot-info-popup';
+            hotspotInfoPopup.innerHTML = `
+                <img class="hotspot-info-logo" src="${infoLogoUrl}" alt="Harper Logo" />
+                <div class="hotspot-info-inner">
+                    <div class="hotspot-info-icon"><i class="fas fa-info-circle"></i></div>
+                    <h3>${title}</h3>
+                </div>
+                ${content}
+                <button id="closeHotspotInfo" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: rgba(255,255,255,0.75); font-size: 1.4rem; cursor: pointer;">&times;</button>
+            `;
+            document.body.appendChild(hotspotInfoPopup);
+
+            if (anchorElement) {
+                const rect = anchorElement.getBoundingClientRect();
+                const left = rect.left + rect.width / 2;
+                const top = rect.bottom + 12;
+                hotspotInfoPopup.style.left = `${left}px`;
+                hotspotInfoPopup.style.top = `${top}px`;
+                hotspotInfoPopup.style.transform = 'translateX(-50%)';
+            } else {
+                hotspotInfoPopup.style.left = '50%';
+                hotspotInfoPopup.style.top = '50%';
+                hotspotInfoPopup.style.transform = 'translate(-50%, -50%)';
+            }
+
+            // Close button listener
+            document.getElementById('closeHotspotInfo').addEventListener('click', () => {
+                if (hotspotInfoPopup) {
+                    hotspotInfoPopup.remove();
+                    hotspotInfoPopup = null;
+                }
+            });
+
+            // Close when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function outsideClick(e) {
+                    if (hotspotInfoPopup && !hotspotInfoPopup.contains(e.target)) {
+                        hotspotInfoPopup.remove();
+                        hotspotInfoPopup = null;
+                        document.removeEventListener('click', outsideClick);
+                    }
+                });
+            }, 100);
+        }
+
+    // Build Sidebar List
+    function buildSidebar() {
+        const container = document.getElementById('sceneList');
+        container.innerHTML = '';
+        const scenes = tourConfig.scenes;
+        const icons = { 
+            exterior: "fa-hotel", 
+            lobby: "fa-building", 
+            koridor: "fa-walking",
+            lift: "fa-arrow-up",
+            floor_3: "fa-layer-group",
+            room: "fa-door-open",
+            deluxe_room: "fa-bed", 
+            deluxe_premier: "fa-crown",
+            exe_suite: "fa-gem", 
+            junior_suite: "fa-couch",
+            ballroom: "fa-users",
+            pool_area: "fa-swimming-pool"
+        };
+        
+        // Menampilkan semua scene yang ada di config secara dinamis
+        Object.keys(scenes).forEach(id => {
+            const data = scenes[id];
+            const div = document.createElement('div');
+            div.className = 'scene-item';
+            if(id === currentSceneId) div.classList.add('active');
+            div.dataset.scene = id;
+            
+            // Gunakan icon dari list jika ada, jika tidak gunakan default
+            const iconClass = icons[id] || 'fa-map-marker-alt';
+            
+            div.innerHTML = `<i class="fas ${iconClass}"></i><span>${data.title}</span>`;
+            div.addEventListener('click', () => {
+                loadScene(id, true);
+                document.getElementById('sidebar').classList.remove('open');
+            });
+            container.appendChild(div);
+        });
+    }
+    
+    // Music Control
+    const musicBtn = document.getElementById('musicBtn');
+    
+    // Function to update UI based on music state
+    function updateMusicUIState() {
+        if(bgMusic.paused) {
+            musicBtn.style.background = "rgba(17,17,17,0.8)";
+            musicBtn.style.color = "#C8A96A";
+        } else {
+            musicBtn.style.background = "#C8A96A";
+            musicBtn.style.color = "#111";
+        }
+    }
+    
+    // Set initial state after musicBtn is defined
+    updateMusicUIState();
+
+    musicBtn.addEventListener('click', () => {
+        if(bgMusic.paused) {
+            bgMusic.play().then(updateMusicUIState);
+        } else {
+            bgMusic.pause();
+            updateMusicUIState();
+        }
+    });
+
+    // Info Scene Control - Panel closes on global click outside
+    const infoPopupPanel = document.getElementById('info-popup-panel');
+    
+    infoPopupPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!infoPopupPanel.contains(e.target)) {
+            infoPopupPanel.classList.remove('show');
+        }
+    });
+    
+    // Hotspot pulse secara otomatis dari pannellum sudah scale, tapi tambah custom tooltip style
+    // Kontrol UI
+    document.getElementById('homeBtn').addEventListener('click', () => {
+        loadScene(tourConfig.default.firstScene);
+    });
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+        const elem = document.documentElement;
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    });
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+        if(panoViewer) panoViewer.setHfov(panoViewer.getHfov() - 10);
+    });
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+        if(panoViewer) panoViewer.setHfov(panoViewer.getHfov() + 10);
+    });
+    document.getElementById('resetViewBtn').addEventListener('click', () => {
+        if(panoViewer) {
+            if (currentSceneId === 'exterior') {
+                panoViewer.setYaw(10);
+                panoViewer.setPitch(-15);
+                panoViewer.setHfov(110);
+            } else {
+                panoViewer.setYaw(0);
+                panoViewer.setPitch(0);
+                panoViewer.setHfov(100);
+            }
+        }
+    });
+    const autoBtn = document.getElementById('autoRotateBtn');
+    
+    // Set initial button state based on autoRotateActive
+    if(autoRotateActive) {
+        autoBtn.style.background = "#C8A96A";
+        autoBtn.style.color = "#111";
+    }
+
+    autoBtn.addEventListener('click', () => {
+        if(panoViewer) {
+            if(!autoRotateActive) {
+                panoViewer.startAutoRotate? panoViewer.startAutoRotate(1.2) : null;
+                autoRotateActive = true;
+                autoBtn.style.background = "#C8A96A";
+                autoBtn.style.color = "#111";
+            } else {
+                panoViewer.stopAutoRotate?.();
+                autoRotateActive = false;
+                autoBtn.style.background = "rgba(17,17,17,0.8)";
+                autoBtn.style.color = "#C8A96A";
+            }
+        }
+    });
+    
+    // Hotspot Helper Logic
+    let helperActive = false;
+    const helperBtn = document.getElementById('hotspotHelperBtn');
+    const coordPopup = document.getElementById('coordinatePopup');
+    const pitchDisplay = document.getElementById('coordPitch');
+    const yawDisplay = document.getElementById('coordYaw');
+    const copyBtn = document.getElementById('copyCoordsBtn');
+    const closePopupBtn = document.getElementById('closeCoordPopup');
+
+    helperBtn.addEventListener('click', () => {
+        helperActive = !helperActive;
+        if(helperActive) {
+            helperBtn.style.background = "#C8A96A";
+            helperBtn.style.color = "#111";
+            alert("Mode Pengatur Hotspot Aktif! Klik di mana saja pada gambar 360 untuk mengambil koordinat.");
+        } else {
+            helperBtn.style.background = "rgba(17,17,17,0.8)";
+            helperBtn.style.color = "#C8A96A";
+            coordPopup.style.display = 'none';
+        }
+    });
+
+    // Capture click on panorama
+    document.getElementById('panorama').addEventListener('mousedown', (e) => {
+        if(helperActive && panoViewer) {
+            // Wait a tiny bit for the view to settle if dragging
+            setTimeout(() => {
+                const pitch = panoViewer.getPitch().toFixed(2);
+                const yaw = panoViewer.getYaw().toFixed(2);
+                
+                pitchDisplay.innerText = pitch;
+                yawDisplay.innerText = yaw;
+                coordPopup.style.display = 'block';
+                
+                // Update Copy Button Data
+                copyBtn.onclick = () => {
+                    const jsonStr = `{ "pitch": ${pitch}, "yaw": ${yaw}, "type": "scene", "text": "Ke Scene Baru", "sceneId": "ganti_ini", "tooltip": "Ganti Ini" }`;
+                    navigator.clipboard.writeText(jsonStr).then(() => {
+                        alert("Koordinat disalin ke clipboard!");
+                    });
+                };
+            }, 100);
+        }
+    });
+
+    closePopupBtn.addEventListener('click', () => {
+        coordPopup.style.display = 'none';
+    });
+
+    // Sidebar toggles
+    document.getElementById('toggleSidebarBtn').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.add('open');
+    });
+    document.getElementById('closeSidebar').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+    });
+    document.getElementById('closeInfo').addEventListener('click', () => {
+        document.getElementById('infoPanel').classList.remove('open');
+    });
+    
+    // Invisible Trigger Zones for Menus
+    const miniMap = document.getElementById('miniMap');
+    const controlsPanel = document.querySelector('.controls-panel');
+    const miniMapTrigger = document.getElementById('miniMapTrigger');
+    const controlsPanelTrigger = document.getElementById('controlsPanelTrigger');
+
+    console.log('Debug: miniMap:', miniMap);
+    console.log('Debug: controlsPanel:', controlsPanel);
+    console.log('Debug: miniMapTrigger:', miniMapTrigger);
+    console.log('Debug: controlsPanelTrigger:', controlsPanelTrigger);
+
+    // Mini Map Trigger (Bottom)
+    miniMapTrigger.addEventListener('mouseenter', () => {
+        console.log('Debug: miniMapTrigger mouseenter');
+        miniMap.classList.add('mobile-open');
+        console.log('Debug: miniMap classes:', miniMap.classList);
+    });
+    miniMapTrigger.addEventListener('mouseleave', () => {
+        console.log('Debug: miniMapTrigger mouseleave');
+        miniMap.classList.remove('mobile-open');
+    });
+    miniMapTrigger.addEventListener('click', () => {
+        console.log('Debug: miniMapTrigger click');
+        miniMap.classList.toggle('mobile-open');
+    });
+
+    // Also keep mini map hover support for when it's visible
+    miniMap.addEventListener('mouseenter', () => {
+        console.log('Debug: miniMap mouseenter');
+        miniMap.classList.add('mobile-open');
+    });
+    miniMap.addEventListener('mouseleave', () => {
+        console.log('Debug: miniMap mouseleave');
+        miniMap.classList.remove('mobile-open');
+    });
+
+    // Controls Panel Trigger (Right)
+    controlsPanelTrigger.addEventListener('mouseenter', () => {
+        console.log('Debug: controlsPanelTrigger mouseenter');
+        controlsPanel.classList.add('mobile-open');
+        console.log('Debug: controlsPanel classes:', controlsPanel.classList);
+    });
+    controlsPanelTrigger.addEventListener('mouseleave', () => {
+        console.log('Debug: controlsPanelTrigger mouseleave');
+        controlsPanel.classList.remove('mobile-open');
+    });
+    controlsPanelTrigger.addEventListener('click', () => {
+        console.log('Debug: controlsPanelTrigger click');
+        controlsPanel.classList.toggle('mobile-open');
+    });
+
+    // Also keep controls panel hover support for when it's visible
+    controlsPanel.addEventListener('mouseenter', () => {
+        console.log('Debug: controlsPanel mouseenter');
+        controlsPanel.classList.add('mobile-open');
+    });
+    controlsPanel.addEventListener('mouseleave', () => {
+        console.log('Debug: controlsPanel mouseleave');
+        controlsPanel.classList.remove('mobile-open');
+    });
+
+    // Keep mini map click for scene navigation
+    // Mini map click
+    document.querySelectorAll('.mini-map span').forEach(el => {
+        el.addEventListener('click', (e) => {
+            const sceneId = el.dataset.scene;
+            if(sceneId) loadScene(sceneId, true);
+        });
+    });
+    // Welcome Modal & GSAP
+    document.getElementById('startTourBtn').addEventListener('click', () => {
+        gsap.to("#welcomeModal", {
+            opacity: 0,
+            duration: 1,
+            onComplete: () => {
+                document.getElementById('welcomeModal').style.display = 'none';
+                exteriorIntroRequested = true;
+                runExteriorIntro();
+                // Always play music when tour starts
+                try {
+                    bgMusic.currentTime = 0;
+                    bgMusic.play()
+                        .then(() => {
+                            console.log("Musik berhasil diputar!");
+                            updateMusicUIState();
+                        })
+                        .catch((error) => {
+                            console.error("Gagal memutar musik:", error);
+                            alert("Silakan klik tombol musik di pojok kanan atas untuk memulai musik.");
+                        });
+                } catch (error) {
+                    console.error("Error saat memutar musik:", error);
+                }
+            }
+        });
+        
+        // Initial animations for UI
+        gsap.from(".logo-overlay", { x: -100, opacity: 0, duration: 1, delay: 0.5 });
+        gsap.from(".controls-panel", { x: 100, opacity: 0, duration: 1, delay: 0.8 });
+        gsap.from(".mini-map", { y: 100, opacity: 0, duration: 1, delay: 1 });
+        gsap.from(".toggle-sidebar", { x: -100, opacity: 0, duration: 1, delay: 1.2 });
+        gsap.from(".book-now-btn", { scale: 0, opacity: 0, duration: 0.8, delay: 1.5, ease: "back.out(1.7)" });
+    });
+
+    // Preload awal + sidebar build
+    initTour();
+    
+    // Custom styling for tooltip hover
+    setInterval(() => {
+        // perbaiki hotspot tooltip untuk style premium
+        document.querySelectorAll('.pnlm-hotspot').forEach(hs => {
+            if(!hs.getAttribute('data-custom')) {
+                hs.setAttribute('data-custom', 'true');
+                
+                // Ambil teks dari atribut tooltip (Pannellum menyimpan di sini)
+                const tooltipText = hs.dataset.tooltip || hs.title || "";
+                
+                hs.addEventListener('mouseenter', (e) => {
+                    if(tooltipText) {
+                        let tool = document.createElement('div');
+                        tool.className = 'custom-tooltip';
+                        tool.innerText = tooltipText;
+                        tool.style.position = 'fixed'; // Gunakan fixed agar tidak terpotong container
+                        tool.style.zIndex = 10000;
+                        document.body.appendChild(tool);
+                        
+                        const rect = hs.getBoundingClientRect();
+                        tool.style.left = (rect.left + rect.width/2 - tool.offsetWidth/2) + 'px';
+                        tool.style.top = (rect.top - 40) + 'px';
+                        hs._tooltip = tool;
+                    }
+                });
+                
+                hs.addEventListener('mouseleave', () => {
+                    if(hs._tooltip) {
+                        hs._tooltip.remove();
+                        hs._tooltip = null;
+                    }
+                });
+            }
+        });
+    }, 500); // Interval lebih cepat agar lebih responsif
+    
+    console.log("Virtual Tour 360° Harper Palembang Siap");
+</script>
+</body>
+</html>

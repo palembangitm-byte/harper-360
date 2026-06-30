@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Harper Palembang CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #C8A96A;
+            --dark: #111;
+            --light: #f4f4f4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--dark); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* Background Decoration */
+        .bg-decor {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('../foto/Harper Palembang360.jpg') center/cover no-repeat;
+            opacity: 0.3;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid rgba(200, 169, 106, 0.3);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-area {
+            margin-bottom: 2.5rem;
+        }
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 2rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+        .logo-subtitle {
+            color: #888;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+        input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 45px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 15px rgba(200, 169, 106, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+        .login-btn:hover {
+            background: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .login-btn:active { transform: translateY(-1px); }
+
+        .error-msg {
+            color: #ff5555;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="bg-decor"></div>
+    
+    <div class="login-card">
+    <div class="logo-area">
+        <img src="../foto/Logo - Harper (WHITE).png" alt="Harper Logo" style="height: 60px; margin-bottom: 1rem;">
+        <h1 class="logo-title">HARPER</h1>
+        <p class="logo-subtitle">CMS Administration</p>
+    </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
+                </div>
+            </div>
+            
+            <div id="errorMsg" class="error-msg">Username atau password salah!</div>
+            
+            <button type="submit" class="login-btn">MASUK SEKARANG</button>
+        </form>
+
+        <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali ke Virtual Tour</a>
+    </div>
+
+    <script>
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            if (window.location.protocol.startsWith('http')) {
+                return window.location.origin + endpoint;
+            }
+            return 'http://localhost:3000' + endpoint;
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('cms_logged_in') === 'true') {
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const error = document.getElementById('errorMsg');
+            const btn = e.target.querySelector('button');
+
+            error.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = 'MEMPROSES...';
+
+            try {
+                const response = await fetch(getApiUrl('/api/login'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('cms_logged_in', 'true');
+                    localStorage.setItem('cms_role', data.user.role);
+                    localStorage.setItem('cms_user_id', data.user.id);
+                    localStorage.setItem('cms_username', data.user.username);
+                    window.location.href = 'index.html';
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                error.style.display = 'block';
+                error.innerText = err.message || 'Username atau password salah!';
+                btn.disabled = false;
+                btn.innerText = 'MASUK SEKARANG';
+                document.getElementById('password').value = '';
+            }
+        });
+    </script>
+</body>
+</html>
