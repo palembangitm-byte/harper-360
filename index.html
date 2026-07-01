@@ -1194,9 +1194,6 @@
             renderFooterSocialTray();
             renderFooterCopyright();
             
-            // Initial load
-            loadScene(tourConfig.default.firstScene);
-            
             console.log("Virtual Tour 360° Harper Palembang Siap");
         } catch (error) {
             console.error("Gagal memuat konfigurasi tour:", error);
@@ -1209,6 +1206,7 @@
     let autoRotateActive = true;
     let exteriorIntroRequested = false;
     let exteriorIntroRan = false;
+    let tourLoaded = false;
     let bgMusic = new Audio('https://res.cloudinary.com/dcsvtyhhe/video/upload/v1782803793/The_Golden_Meridian_feute1.mp3'); // Smooth background jazz
     bgMusic.loop = true;
     bgMusic.volume = 0.2;
@@ -1850,6 +1848,10 @@
             duration: 1,
             onComplete: () => {
                 document.getElementById('welcomeModal').style.display = 'none';
+                if (!tourLoaded) {
+                    loadScene(tourConfig.default.firstScene);
+                    tourLoaded = true;
+                }
                 exteriorIntroRequested = true;
                 runExteriorIntro();
                 // Always play music when tour starts
