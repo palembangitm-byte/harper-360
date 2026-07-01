@@ -183,9 +183,11 @@
             box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
-            width: min(360px, calc(100vw - 2rem));
+            width: min(360px, calc(100vw - 4rem));
             max-width: 360px;
+            min-width: 280px;
             color: #fff;
+            z-index: 10000;
         }
 
         .hotspot-info-popup .hotspot-info-logo {
@@ -1525,9 +1527,19 @@
 
             if (anchorElement) {
                 const rect = anchorElement.getBoundingClientRect();
+                const popupWidth = 360;
                 const left = rect.left + rect.width / 2;
                 const top = rect.bottom + 12;
-                hotspotInfoPopup.style.left = `${left}px`;
+                
+                // Hitung posisi agar tidak keluar layar
+                let finalLeft = left;
+                if (finalLeft - popupWidth / 2 < 20) {
+                    finalLeft = popupWidth / 2 + 20;
+                } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
+                    finalLeft = window.innerWidth - popupWidth / 2 - 20;
+                }
+
+                hotspotInfoPopup.style.left = `${finalLeft}px`;
                 hotspotInfoPopup.style.top = `${top}px`;
                 hotspotInfoPopup.style.transform = 'translateX(-50%)';
             } else {
