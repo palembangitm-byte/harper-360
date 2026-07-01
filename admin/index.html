@@ -73,7 +73,7 @@
             display: block; 
             width: 100%; 
             height: 100%; 
-            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803810/WhatsApp_Image_2026-06-30_at_13.46.54_qsub6b.jpg');
+            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782889113/WhatsApp_Image_2026-06-30_at_13.46.54_qsub6b-removebg-preview_x5bdou.png');
             background-size: contain; 
             background-repeat: no-repeat; 
             background-position: center; 
@@ -845,25 +845,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-image"></i> Upload Logo Custom (sesuai permintaan)</label>
-                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <input type="file" id="customLogoUpload" accept="image/*" style="flex: 1;">
-                        <button type="button" class="btn btn-primary" onclick="uploadCustomLogo()" id="customLogoUploadBtn">
-                            <i class="fas fa-upload"></i> Upload Logo
-                        </button>
-                    </div>
-                    <div id="customLogoPreviewContainer" class="music-item" style="height: auto; padding: 10px; display: none;">
-                        <span>Logo saat ini: </span>
-                        <img id="customLogoPreview" src="" alt="Custom Logo Preview" style="max-height: 60px; margin-left: 10px;">
-                        <button class="action-btn delete-btn" onclick="deleteCustomLogo()" style="margin-left: auto;"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-card admin-only">
-                <h3 class="settings-section-title"><i class="fas fa-image"></i> Pengaturan Logo</h3>
-                <div class="form-group">
-                    <label>Logo Saat Ini</label>
+                    <label><i class="fas fa-image"></i> Logo</label>
                     <div id="currentLogoInfo" class="music-item" style="height: auto; padding: 10px;">
                         <div id="logoPreviewContainer" style="position: relative; display: inline-block; background: linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333); background-size: 20px 20px; background-position: 0 0, 10px 10px; border-radius: 8px; padding: 10px;">
                             <img id="logoPreview" src="" alt="Logo Preview" style="display: none;">
@@ -873,10 +855,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Upload Logo Baru</label>
+                    <label>Upload Logo</label>
                     <div style="display: flex; gap: 0.5rem;">
                         <input type="file" id="logoUpload" accept="image/*" style="flex: 1;">
-                        <button type="button" class="btn btn-secondary" onclick="uploadLogo()" id="logoUploadBtn">
+                        <button type="button" class="btn btn-primary" onclick="uploadLogo()" id="logoUploadBtn">
                             <i class="fas fa-upload"></i> Upload Logo
                         </button>
                     </div>
@@ -1610,7 +1592,6 @@
                 if (!config.settings.logoHeight) config.settings.logoHeight = 60;
                 if (!config.settings.logoWidth) config.settings.logoWidth = 150;
                 renderScenes();
-                updateCustomLogoUI();
             } catch (e) {
                 console.error("❌ Gagal load config", e);
                 showServerError();
@@ -2524,73 +2505,6 @@
                 alert("Terjadi kesalahan koneksi ke server.");
             }
         }
-
-        async function uploadCustomLogo() {
-            const fileInput = document.getElementById('customLogoUpload');
-            const btn = document.getElementById('customLogoUploadBtn');
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Pilih file gambar logo terlebih dahulu!");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('logo', fileInput.files[0]);
-
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-                
-                const uploadUrl = getApiUrl('/api/upload-logo');
-                const response = await fetch(uploadUrl, { method: 'POST', body: formData });
-                
-                if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    config.settings.logoUrl = result.filePath;
-                    updateCustomLogoUI();
-                    await saveConfigToServer(true);
-                    alert("Custom Logo berhasil diperbarui!");
-                    fileInput.value = '';
-                } else {
-                    alert("Gagal upload custom logo: " + result.message);
-                }
-            } catch (error) {
-                console.error("Custom logo upload error:", error);
-                alert("Terjadi kesalahan koneksi ke server.\n\nDetail: " + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Logo';
-            }
-        }
-
-        async function deleteCustomLogo() {
-            if (!confirm("Hapus custom logo?")) return;
-            try {
-                config.settings.logoUrl = "";
-                updateCustomLogoUI();
-                await saveConfigToServer(true);
-                alert("Custom logo berhasil dihapus.");
-            } catch (error) {
-                console.error("Delete custom logo error:", error);
-                alert("Terjadi kesalahan koneksi ke server.");
-            }
-        }
-
-        function updateCustomLogoUI() {
-            const previewContainer = document.getElementById('customLogoPreviewContainer');
-            const previewImg = document.getElementById('customLogoPreview');
-            if (config.settings.logoUrl) {
-                previewImg.src = isAbsoluteUrl(config.settings.logoUrl) ? config.settings.logoUrl : config.settings.logoUrl;
-                previewContainer.style.display = 'flex';
-            } else {
-                previewContainer.style.display = 'none';
-            }
-        }
-
-
 
         async function uploadLogo() {
             const fileInput = document.getElementById('logoUpload');
