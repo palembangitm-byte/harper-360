@@ -1213,7 +1213,7 @@
                             cssClass: hs.type === 'info' ? 'custom-info-hotspot' : 'custom-arrow-hotspot'
                         };
 
-                                if (hs.type === 'info') {
+                        if (hs.type === 'info') {
                             processedHs.tooltip = hs.text || hs.infoText || 'Info';
                             processedHs.createTooltipFunc = function(el) {
                                 el.classList.add('custom-hotspot-tooltip');
@@ -1223,19 +1223,12 @@
                                 el.dataset.hotspotInfoText = hs.infoText || '';
                                 el.dataset.infoClickBound = 'true';
                                 el.addEventListener('click', function(event) {
-                                    console.log('Info hotspot clicked', hs.text, hs.infoText, el);
+                                    console.log('Info hotspot clicked (listener)', hs.text, hs.infoText, el);
                                     event.stopPropagation();
                                     event.preventDefault();
                                     showHotspotInfoPopup(el.dataset.hotspotTitle, el.dataset.hotspotInfoText, el);
                                 });
                                 return el;
-                            };
-                            processedHs.clickHandlerFunc = function(event, args) {
-                                console.log('Info hotspot clicked', hs.text, hs.infoText);
-                                if (event && typeof event.stopPropagation === 'function') {
-                                    event.stopPropagation();
-                                    event.preventDefault();
-                                }
                             };
                         }
 
@@ -1437,81 +1430,84 @@
         window.addEventListener('resize', positionInfoIcon);
 
         // Show popup for info hotspot
-        let hotspotInfoPopup = null;
-        function showHotspotInfoPopup(title, text, anchorElement = null) {
-            // Remove existing popup if any
-            if (hotspotInfoPopup) {
-                hotspotInfoPopup.remove();
-            }
+    let hotspotInfoPopup = null;
+    function showHotspotInfoPopup(title, text, anchorElement = null) {
+        console.log('showHotspotInfoPopup called', title, text, anchorElement);
+        // Remove existing popup if any
+        if (hotspotInfoPopup) {
+            hotspotInfoPopup.remove();
+        }
 
-            const infoLogoUrl = 'https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782717434/harper-360/logos/lgdiyyucw8c3kdgnx31d.png';
-            const rows = text
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                .map(line => {
-                    if (line.includes(':')) {
-                        const [key, ...rest] = line.split(':');
-                        return { label: key.trim(), value: rest.join(':').trim() };
-                    }
-                    return null;
-                })
-                .filter(item => item !== null);
+        const infoLogoUrl = 'https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782717434/harper-360/logos/lgdiyyucw8c3kdgnx31d.png';
+        const rows = text
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .map(line => {
+                if (line.includes(':')) {
+                    const [key, ...rest] = line.split(':');
+                    return { label: key.trim(), value: rest.join(':').trim() };
+                }
+                return null;
+            })
+            .filter(item => item !== null);
 
-            const content = rows.length > 0
-                ? rows.map(row => `
-                    <div class="hotspot-info-row">
-                        <strong>${row.label}</strong>
-                        <span>${row.value}</span>
-                    </div>
-                `).join('')
-                : `<div class="hotspot-info-body">${text.replace(/\n/g, '<br>')}</div>`;
-
-            // Create popup
-            hotspotInfoPopup = document.createElement('div');
-            hotspotInfoPopup.className = 'hotspot-info-popup';
-            hotspotInfoPopup.innerHTML = `
-                <img class="hotspot-info-logo" src="${infoLogoUrl}" alt="Harper Logo" />
-                <div class="hotspot-info-inner">
-                    <div class="hotspot-info-icon"><i class="fas fa-info-circle"></i></div>
-                    <h3>${title}</h3>
+        const content = rows.length > 0
+            ? rows.map(row => `
+                <div class="hotspot-info-row">
+                    <strong>${row.label}</strong>
+                    <span>${row.value}</span>
                 </div>
-                ${content}
-                <button id="closeHotspotInfo" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: rgba(255,255,255,0.75); font-size: 1.4rem; cursor: pointer;">&times;</button>
-            `;
-            document.body.appendChild(hotspotInfoPopup);
+            `).join('')
+            : `<div class="hotspot-info-body">${text.replace(/\n/g, '<br>')}</div>`;
 
-            if (anchorElement) {
-                const rect = anchorElement.getBoundingClientRect();
-                const popupWidth = 320;
-                const left = rect.left + rect.width / 2;
-                const top = rect.bottom + 12;
-                
-                let finalLeft = left;
-                let finalTop = top;
-                
-                // Periksa jika popup keluar layar bawah
-                if (finalTop + 300 > window.innerHeight - 20) {
-                    finalTop = rect.top - 300;
-                }
-                
-                // Periksa jika popup keluar layar kiri/kanan
-                if (finalLeft - popupWidth / 2 < 20) {
-                    finalLeft = popupWidth / 2 + 20;
-                } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
-                    finalLeft = window.innerWidth - popupWidth / 2 - 20;
-                }
+        // Create popup
+        hotspotInfoPopup = document.createElement('div');
+        hotspotInfoPopup.className = 'hotspot-info-popup';
+        hotspotInfoPopup.innerHTML = `
+            <img class="hotspot-info-logo" src="${infoLogoUrl}" alt="Harper Logo" />
+            <div class="hotspot-info-inner">
+                <div class="hotspot-info-icon"><i class="fas fa-info-circle"></i></div>
+                <h3>${title}</h3>
+            </div>
+            ${content}
+            <button id="closeHotspotInfo" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: rgba(255,255,255,0.75); font-size: 1.4rem; cursor: pointer;">&times;</button>
+        `;
+        console.log('Popup created', hotspotInfoPopup);
+        document.body.appendChild(hotspotInfoPopup);
 
-                hotspotInfoPopup.style.left = `${finalLeft}px`;
-                hotspotInfoPopup.style.top = `${finalTop}px`;
-                hotspotInfoPopup.style.bottom = 'auto';
-                hotspotInfoPopup.style.transform = 'translateX(-50%)';
-            } else {
-                hotspotInfoPopup.style.left = '50%';
-                hotspotInfoPopup.style.top = '50%';
-                hotspotInfoPopup.style.bottom = 'auto';
-                hotspotInfoPopup.style.transform = 'translate(-50%, -50%)';
+        if (anchorElement) {
+            const rect = anchorElement.getBoundingClientRect();
+            console.log('Anchor rect', rect);
+            const popupWidth = 320;
+            const left = rect.left + rect.width / 2;
+            const top = rect.bottom + 12;
+            
+            let finalLeft = left;
+            let finalTop = top;
+            
+            // Periksa jika popup keluar layar bawah
+            if (finalTop + 300 > window.innerHeight - 20) {
+                finalTop = rect.top - 300;
             }
+            
+            // Periksa jika popup keluar layar kiri/kanan
+            if (finalLeft - popupWidth / 2 < 20) {
+                finalLeft = popupWidth / 2 + 20;
+            } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
+                finalLeft = window.innerWidth - popupWidth / 2 - 20;
+            }
+
+            hotspotInfoPopup.style.left = `${finalLeft}px`;
+            hotspotInfoPopup.style.top = `${finalTop}px`;
+            hotspotInfoPopup.style.bottom = 'auto';
+            hotspotInfoPopup.style.transform = 'translateX(-50%)';
+        } else {
+            hotspotInfoPopup.style.left = '50%';
+            hotspotInfoPopup.style.top = '50%';
+            hotspotInfoPopup.style.bottom = 'auto';
+            hotspotInfoPopup.style.transform = 'translate(-50%, -50%)';
+        }
 
             // Close button listener
             document.getElementById('closeHotspotInfo').addEventListener('click', () => {
