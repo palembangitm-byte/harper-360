@@ -71,22 +71,22 @@
         .logo-overlay {
             position: fixed;
             top: 1.5rem;
-            left: calc(2rem + 54px + 1rem); /* Posisi di sebelah kanan tombol toggle sidebar */
+            left: calc(2rem + 54px + 0.5rem); /* Sesuaikan jarak tanpa latar belakang */
             z-index: 10001; /* Di atas welcome modal agar selalu terlihat */
             pointer-events: auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(17, 17, 17, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 10px 25px;
-            border-radius: 50px;
-            border: 1px solid rgba(200, 169, 106, 0.35);
+            background: transparent; /* Hapus latar belakang hitam */
+            backdrop-filter: none; /* Hapus blur */
+            -webkit-backdrop-filter: none;
+            padding: 0; /* Hapus padding */
+            border-radius: 0;
+            border: none; /* Hapus border */
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            height: 54px; /* Sama tinggi dengan tombol toggle sidebar */
-            min-width: 120px; /* Lebar minimal agar selalu terlihat */
+            box-shadow: none; /* Hapus bayangan */
+            height: auto; /* Biar sesuai ukuran gambar */
+            min-width: auto; /* Hapus lebar minimal */
             opacity: 1 !important; /* Paksa opacity selalu 1 */
         }
 
@@ -984,9 +984,12 @@
 
             .logo-overlay {
                 top: 1rem;
-                left: calc(1rem + 54px + 0.8rem); /* Sejajar tombol toggle sidebar mobile */
-                padding: 0.5rem 1rem;
-                height: 54px;
+                left: calc(1rem + 54px + 0.5rem); /* Sejajar tombol toggle sidebar mobile */
+                padding: 0;
+                height: auto;
+                background: transparent;
+                border: none;
+                box-shadow: none;
             }
             .logo-overlay img {
                 height: 35px !important;
