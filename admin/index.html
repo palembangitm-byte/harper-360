@@ -2350,6 +2350,17 @@
                     effects: []
                 };
             }
+            // Handle backward compatibility: if logoUrl exists, convert to logo object
+            if (config.settings.logoUrl && (!config.settings.logo || !config.settings.logo.url)) {
+                config.settings.logo = {
+                    url: config.settings.logoUrl,
+                    size: 60,
+                    opacity: 100,
+                    dropShadow: true,
+                    position: "top-left",
+                    effects: []
+                };
+            }
 
             // Ensure logo object has all defaults
             if (!config.settings.logo.size) config.settings.logo.size = 60;
@@ -2435,10 +2446,18 @@
             const logoPreview = document.getElementById('logoPreview');
             const logoPathText = document.getElementById('logoPathText');
             const delBtn = document.getElementById('deleteLogoBtn');
-            const logoUrl = typeof config.settings.logo === 'string' ? config.settings.logo : config.settings.logo.url;
+            let logoUrl = null;
+            if (typeof config.settings.logo === 'string') {
+                logoUrl = config.settings.logo;
+            } else if (typeof config.settings.logo === 'object' && config.settings.logo.url) {
+                logoUrl = config.settings.logo.url;
+            } else if (config.settings.logoUrl) {
+                logoUrl = config.settings.logoUrl;
+            }
             
             if (logoUrl) {
-                logoPreview.src = '../' + logoUrl;
+                // Jika url absolute (Cloudinary), gunakan langsung, jangan tambahkan '../'
+                logoPreview.src = logoUrl.startsWith('http') ? logoUrl : '../' + logoUrl;
                 logoPreview.style.display = 'block';
                 logoPathText.innerText = logoUrl;
                 if (delBtn) {
@@ -2493,7 +2512,17 @@
                 
                 const result = await response.json();
                 if (result.success || response.status === 404) {
-                    if (type === 'logo') config.settings.logo = "";
+                    if (type === 'logo') {
+                        config.settings.logo = {
+                            url: "",
+                            size: 60,
+                            opacity: 100,
+                            dropShadow: true,
+                            position: "top-left",
+                            effects: []
+                        };
+                        config.settings.logoUrl = "";
+                    }
                     else if (type === 'music') config.settings.music.url = "";
                     
                     updateLogoUI();
