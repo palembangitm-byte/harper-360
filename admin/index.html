@@ -81,9 +81,29 @@
             animation: hotspotPulse 2s infinite ease-in-out; 
             transition: transform 0.2s ease, filter 0.2s ease; 
         } 
+
+        /* Elemen dalam yang menampung gambar ikon dan animasi untuk INFO HOTSPOT */ 
+        .custom-info-hotspot::after { 
+            content: ""; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782892250/WhatsApp_Image_2026-06-30_at_13.46.55_cemmzk-removebg-preview_j3c8dr.png');
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            animation: hotspotPulse 2s infinite ease-in-out; 
+            transition: transform 0.2s ease, filter 0.2s ease; 
+        } 
  
         /* Efek hover saat kursor mendekat */ 
         .custom-arrow-hotspot:hover::after { 
+            transform: scale(1.15); 
+            filter: drop-shadow(0px 0px 8px rgba(30, 144, 255, 0.8)); 
+        } 
+
+        /* Efek hover untuk INFO HOTSPOT */ 
+        .custom-info-hotspot:hover::after { 
             transform: scale(1.15); 
             filter: drop-shadow(0px 0px 8px rgba(30, 144, 255, 0.8)); 
         } 
