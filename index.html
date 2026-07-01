@@ -1527,12 +1527,19 @@
 
             if (anchorElement) {
                 const rect = anchorElement.getBoundingClientRect();
-                const popupWidth = 360;
+                const popupWidth = 320;
                 const left = rect.left + rect.width / 2;
                 const top = rect.bottom + 12;
                 
-                // Hitung posisi agar tidak keluar layar
                 let finalLeft = left;
+                let finalTop = top;
+                
+                // Periksa jika popup keluar layar bawah
+                if (finalTop + 300 > window.innerHeight - 20) {
+                    finalTop = rect.top - 300;
+                }
+                
+                // Periksa jika popup keluar layar kiri/kanan
                 if (finalLeft - popupWidth / 2 < 20) {
                     finalLeft = popupWidth / 2 + 20;
                 } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
@@ -1540,7 +1547,7 @@
                 }
 
                 hotspotInfoPopup.style.left = `${finalLeft}px`;
-                hotspotInfoPopup.style.top = `${top}px`;
+                hotspotInfoPopup.style.top = `${finalTop}px`;
                 hotspotInfoPopup.style.transform = 'translateX(-50%)';
             } else {
                 hotspotInfoPopup.style.left = '50%';
