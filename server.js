@@ -513,25 +513,53 @@ app.post('/api/upload-logo', upload.single('logo'), async (req, res) => {
             folder: 'harper-360/logos'
         });
 
-        // Update logoUrl di Firestore (jika menggunakan Firebase)
+        // Update logo di Firestore (jika menggunakan Firebase) dengan format yang sesuai
         if (useFirebase && db) {
             const docRef = db.collection('settings').doc('config');
             const doc = await docRef.get();
             if (doc.exists) {
                 await docRef.update({
-                    'settings.logoUrl': result.secure_url
+                    'settings.logo': {
+                        url: result.secure_url,
+                        size: 60,
+                        opacity: 100,
+                        dropShadow: true,
+                        position: "top-center",
+                        effects: []
+                    }
                 });
             } else {
                 await docRef.set({
                     scenes: {},
                     default: { firstScene: "", type: "equirectangular" },
                     settings: { 
-                        logoUrl: result.secure_url, 
-                        logo: "", 
+                        logo: {
+                            url: result.secure_url,
+                            size: 60,
+                            opacity: 100,
+                            dropShadow: true,
+                            position: "top-center",
+                            effects: []
+                        },
                         music: { url: "", autoPlay: true }, 
                         footer: {} 
                     }
                 });
+            }
+        } else {
+            // Jika tidak menggunakan Firebase, update config.json
+            const configData = await readConfig();
+            if (configData) {
+                configData.settings.logo = {
+                    url: result.secure_url,
+                    size: 60,
+                    opacity: 100,
+                    dropShadow: true,
+                    position: "top-center",
+                    effects: []
+                };
+                // Tetap tulis ke file JSON meskipun ada komentar (untuk fallback)
+                await writeConfig(configData);
             }
         }
 
