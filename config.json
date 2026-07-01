@@ -8,11 +8,11 @@
   },
   "settings": {
     "logo": {
-      "url": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803556/JUNIOR_SUITE_xpog1r.png",
+      "url": "foto/Harper Palembang.jpg",
       "size": 67,
       "opacity": 100,
       "dropShadow": true,
-      "position": "top-center",
+      "position": "top-left",
       "effects": [
         "hoverBlur"
       ]
@@ -48,13 +48,13 @@
       "panorama": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803572/HOTEL_e02urc.jpg",
       "description": "Pemandangan megah gedung Harper Palembang dari sudut pandang 360 derajat, berlokasi strategis di pusat kota.",
       "previewImg": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803572/HOTEL_e02urc.jpg",
-      "hfov": 100,
-      "pitch": -40,
-      "yaw": 0,
+      "hfov": 130,
+      "pitch": -20,
+      "yaw": 10,
       "hotSpots": [
         {
-          "pitch": -40,
-          "yaw": 0,
+          "pitch": -36.69,
+          "yaw": 4.01,
           "type": "scene",
           "text": "Masuk ke Lobby",
           "sceneId": "lobby",
