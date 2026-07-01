@@ -69,26 +69,16 @@
 
         /* Logo Overlay */
         .logo-overlay {
-            position: fixed;
-            top: 0.75rem;
-            left: 2rem;
-            z-index: 900;
-            pointer-events: auto;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-soft);
+            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo-overlay img {
-            width: auto;
+            max-width: 100%;
             filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
             transition: all 0.3s ease;
         }
@@ -1016,6 +1006,9 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></div>
+    <div class="logo-overlay">
+        <img id="mainLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo">
+    </div>
     <h3 style="color:#C8A96A; margin-bottom: 1rem;"><i class="fas fa-map-marked-alt"></i> Explore Harper</h3>
     <div class="scene-list" id="sceneList"></div>
 </div>
@@ -1066,10 +1059,6 @@
         <div class="info-divider"></div>
         <p id="info-panel-desc">Deskripsi informasi.</p>
     </div>
-</div>
-
-<div class="logo-overlay">
-    <img id="mainLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo">
 </div>
 
 <div id="panorama"></div>
@@ -1123,29 +1112,6 @@
                 mainLogo.style.height = `${logoSettings.size}px`;
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
-
-                // Apply position (tetap mempertahankan styling glassmorphism)
-                logoOverlay.style.top = '2rem';
-                logoOverlay.style.left = 'auto';
-                logoOverlay.style.right = 'auto';
-                logoOverlay.style.transform = 'none';
-                switch (logoSettings.position) {
-                    case 'top-left':
-                        logoOverlay.style.left = '2rem';
-                        logoOverlay.style.right = 'auto';
-                        logoOverlay.style.transform = 'none';
-                        break;
-                    case 'top-center':
-                        logoOverlay.style.left = '50%';
-                        logoOverlay.style.right = 'auto';
-                        logoOverlay.style.transform = 'translateX(-50%)';
-                        break;
-                    case 'top-right':
-                        logoOverlay.style.right = '2rem';
-                        logoOverlay.style.left = 'auto';
-                        logoOverlay.style.transform = 'none';
-                        break;
-                }
 
                 // Apply effects
                 if (logoSettings.effects.includes('fadeIn')) {
