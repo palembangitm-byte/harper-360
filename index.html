@@ -1525,35 +1525,11 @@
             `;
             document.body.appendChild(hotspotInfoPopup);
 
-            if (anchorElement) {
-                const rect = anchorElement.getBoundingClientRect();
-                const popupWidth = 320;
-                const left = rect.left + rect.width / 2;
-                const top = rect.bottom + 12;
-                
-                let finalLeft = left;
-                let finalTop = top;
-                
-                // Periksa jika popup keluar layar bawah
-                if (finalTop + 300 > window.innerHeight - 20) {
-                    finalTop = rect.top - 300;
-                }
-                
-                // Periksa jika popup keluar layar kiri/kanan
-                if (finalLeft - popupWidth / 2 < 20) {
-                    finalLeft = popupWidth / 2 + 20;
-                } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
-                    finalLeft = window.innerWidth - popupWidth / 2 - 20;
-                }
-
-                hotspotInfoPopup.style.left = `${finalLeft}px`;
-                hotspotInfoPopup.style.top = `${finalTop}px`;
-                hotspotInfoPopup.style.transform = 'translateX(-50%)';
-            } else {
-                hotspotInfoPopup.style.left = '50%';
-                hotspotInfoPopup.style.top = '50%';
-                hotspotInfoPopup.style.transform = 'translate(-50%, -50%)';
-            }
+            // Tampilkan popup di tengah bawah layar, tidak terikat dengan posisi icon
+            hotspotInfoPopup.style.left = '50%';
+            hotspotInfoPopup.style.top = 'auto';
+            hotspotInfoPopup.style.bottom = '30px';
+            hotspotInfoPopup.style.transform = 'translateX(-50%)';
 
             // Close button listener
             document.getElementById('closeHotspotInfo').addEventListener('click', () => {
