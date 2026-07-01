@@ -178,9 +178,6 @@
             min-width: 280px;
             color: #fff;
             z-index: 10000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
         }
 
         .hotspot-info-popup .hotspot-info-logo {
@@ -1053,7 +1050,7 @@
     <a href="admin/login.html" class="admin-link" title="Admin Login"><i class="fas fa-user-shield"></i></a>
 </div>
 
-<div id="left-branding-panel">
+<div id="left-branding-panel" style="display: none;">
     <div id="info-popup-panel">
         <h3 id="info-panel-title">Nama Ruangan</h3>
         <div class="info-divider"></div>
@@ -1235,16 +1232,6 @@
                             };
                             processedHs.clickHandlerFunc = function(event, args) {
                                 console.log('Info hotspot clicked', hs.text, hs.infoText);
-                                const infoPanel = document.getElementById('info-popup-panel');
-                                const infoPanelTitle = document.getElementById('info-panel-title');
-                                const infoPanelDesc = document.getElementById('info-panel-desc');
-                                
-                                if (infoPanel && infoPanelTitle && infoPanelDesc) {
-                                    infoPanelTitle.innerText = hs.text || 'Informasi';
-                                    infoPanelDesc.innerText = hs.infoText || '';
-                                    infoPanel.classList.toggle('show');
-                                }
-                                
                                 if (event && typeof event.stopPropagation === 'function') {
                                     event.stopPropagation();
                                     event.preventDefault();
@@ -1494,11 +1481,37 @@
             `;
             document.body.appendChild(hotspotInfoPopup);
 
-            // Tampilkan popup di tengah bawah layar, tidak terikat dengan posisi icon
-            hotspotInfoPopup.style.left = '50%';
-            hotspotInfoPopup.style.top = 'auto';
-            hotspotInfoPopup.style.bottom = '30px';
-            hotspotInfoPopup.style.transform = 'translateX(-50%)';
+            if (anchorElement) {
+                const rect = anchorElement.getBoundingClientRect();
+                const popupWidth = 320;
+                const left = rect.left + rect.width / 2;
+                const top = rect.bottom + 12;
+                
+                let finalLeft = left;
+                let finalTop = top;
+                
+                // Periksa jika popup keluar layar bawah
+                if (finalTop + 300 > window.innerHeight - 20) {
+                    finalTop = rect.top - 300;
+                }
+                
+                // Periksa jika popup keluar layar kiri/kanan
+                if (finalLeft - popupWidth / 2 < 20) {
+                    finalLeft = popupWidth / 2 + 20;
+                } else if (finalLeft + popupWidth / 2 > window.innerWidth - 20) {
+                    finalLeft = window.innerWidth - popupWidth / 2 - 20;
+                }
+
+                hotspotInfoPopup.style.left = `${finalLeft}px`;
+                hotspotInfoPopup.style.top = `${finalTop}px`;
+                hotspotInfoPopup.style.bottom = 'auto';
+                hotspotInfoPopup.style.transform = 'translateX(-50%)';
+            } else {
+                hotspotInfoPopup.style.left = '50%';
+                hotspotInfoPopup.style.top = '50%';
+                hotspotInfoPopup.style.bottom = 'auto';
+                hotspotInfoPopup.style.transform = 'translate(-50%, -50%)';
+            }
 
             // Close button listener
             document.getElementById('closeHotspotInfo').addEventListener('click', () => {
