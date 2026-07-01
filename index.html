@@ -72,7 +72,7 @@
             position: fixed;
             top: 1.5rem;
             left: calc(2rem + 54px + 1rem); /* Posisi di sebelah kanan tombol toggle sidebar */
-            z-index: 9999;
+            z-index: 10001; /* Di atas welcome modal agar selalu terlihat */
             pointer-events: auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: rgba(17, 17, 17, 0.8);
@@ -1125,7 +1125,7 @@
             if (logoUrl && mainLogo) {
                 mainLogo.src = isAbsoluteUrl(logoUrl) ? logoUrl : logoUrl;
                 logoOverlay.style.display = 'flex';
-                mainLogo.style.height = `${logoSettings.size}px`;
+                // mainLogo.style.height = `${logoSettings.size}px`; /* Pakai CSS height untuk gambar logo */
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
                 console.log('Logo set', mainLogo.src);
@@ -1174,7 +1174,7 @@
                 console.log('No logo url or mainLogo not found');
                 // Fallback: Show default logo
                 logoOverlay.style.display = 'flex';
-                mainLogo.style.height = `${logoSettings.size}px`;
+                // mainLogo.style.height = `${logoSettings.size}px`; /* Pakai CSS height untuk gambar logo */
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
                 
