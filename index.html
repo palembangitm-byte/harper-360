@@ -1102,6 +1102,8 @@
                 } else if (typeof tourConfig.settings.logo === 'object' && tourConfig.settings.logo.url) {
                     logoUrl = tourConfig.settings.logo.url;
                     logoSettings = { ...logoSettings, ...tourConfig.settings.logo };
+                } else if (tourConfig.settings.logoUrl) {
+                    logoUrl = tourConfig.settings.logoUrl;
                 }
             }
             console.log('Logo config', logoUrl, logoSettings);
