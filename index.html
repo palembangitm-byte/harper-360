@@ -79,6 +79,7 @@
 
         .logo-overlay img {
             max-width: 100%;
+            width: auto;
             filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
             transition: all 0.3s ease;
         }
@@ -1085,6 +1086,7 @@
             // Update Logo from config
             const logoOverlay = document.querySelector('.logo-overlay');
             const mainLogo = document.getElementById('mainLogo');
+            console.log('Logo elements', logoOverlay, mainLogo);
             let logoUrl = null;
             let logoSettings = {
                 size: 60,
@@ -1102,6 +1104,7 @@
                     logoSettings = { ...logoSettings, ...tourConfig.settings.logo };
                 }
             }
+            console.log('Logo config', logoUrl, logoSettings);
             
             if (logoUrl && mainLogo) {
                 mainLogo.src = isAbsoluteUrl(logoUrl) ? logoUrl : logoUrl;
@@ -1109,16 +1112,17 @@
                 mainLogo.style.height = `${logoSettings.size}px`;
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
+                console.log('Logo set', mainLogo.src);
 
                 // Apply effects
-                if (logoSettings.effects.includes('fadeIn')) {
+                if (logoSettings.effects && logoSettings.effects.includes('fadeIn')) {
                     mainLogo.style.opacity = '0';
                     mainLogo.style.transition = 'opacity 1s ease-in-out';
                     setTimeout(() => {
                         mainLogo.style.opacity = logoSettings.opacity / 100;
                     }, 100);
                 }
-                if (logoSettings.effects.includes('hoverBlur')) {
+                if (logoSettings.effects && logoSettings.effects.includes('hoverBlur')) {
                     mainLogo.style.transition = mainLogo.style.transition ? mainLogo.style.transition + ', filter 0.3s' : 'filter 0.3s';
                     mainLogo.addEventListener('mouseenter', () => {
                         mainLogo.style.filter = (logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : '') + ' blur(2px)';
@@ -1128,7 +1132,9 @@
                     });
                 }
             } else {
-                if (logoOverlay) logoOverlay.style.display = 'none';
+                console.log('No logo url or mainLogo not found');
+                // Fallback: Show default logo
+                logoOverlay.style.display = 'flex';
             }
 
             // Update Music from config (disabled for now to use the new URL)
