@@ -69,17 +69,27 @@
 
         /* Logo Overlay */
         .logo-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 900;
+            pointer-events: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(200, 169, 106, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            padding: 0.75rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .logo-overlay img {
-            max-width: 100%;
             width: auto;
+            height: 60px;
             filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
             transition: all 0.3s ease;
         }
@@ -1004,11 +1014,13 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></div>
-    <div class="logo-overlay">
-        <img id="mainLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo">
-    </div>
     <h3 style="color:#C8A96A; margin-bottom: 1rem;"><i class="fas fa-map-marked-alt"></i> Explore Harper</h3>
     <div class="scene-list" id="sceneList"></div>
+</div>
+
+<!-- Logo Overlay -->
+<div class="logo-overlay">
+    <img id="mainLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo">
 </div>
 
 <!-- Info Panel -->
@@ -1115,6 +1127,29 @@
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
                 console.log('Logo set', mainLogo.src);
+
+                // Apply position (sesuai config)
+                logoOverlay.style.top = '20px';
+                logoOverlay.style.left = 'auto';
+                logoOverlay.style.right = 'auto';
+                logoOverlay.style.transform = 'none';
+                switch (logoSettings.position) {
+                    case 'top-left':
+                        logoOverlay.style.left = '20px';
+                        logoOverlay.style.right = 'auto';
+                        logoOverlay.style.transform = 'none';
+                        break;
+                    case 'top-center':
+                        logoOverlay.style.left = '50%';
+                        logoOverlay.style.right = 'auto';
+                        logoOverlay.style.transform = 'translateX(-50%)';
+                        break;
+                    case 'top-right':
+                        logoOverlay.style.right = '20px';
+                        logoOverlay.style.left = 'auto';
+                        logoOverlay.style.transform = 'none';
+                        break;
+                }
 
                 // Apply effects
                 if (logoSettings.effects && logoSettings.effects.includes('fadeIn')) {
