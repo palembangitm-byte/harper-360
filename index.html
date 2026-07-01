@@ -1793,7 +1793,11 @@
             onComplete: () => {
                 document.getElementById('welcomeModal').style.display = 'none';
                 if (!tourLoaded) {
-                    loadScene(tourConfig.default.firstScene);
+                    if (tourConfig && tourConfig.default && tourConfig.default.firstScene) {
+                        loadScene(tourConfig.default.firstScene);
+                    } else {
+                        loadScene("exterior"); // Fallback ke exterior
+                    }
                     tourLoaded = true;
                 }
                 exteriorIntroRequested = true;
