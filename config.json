@@ -48,7 +48,7 @@
       "panorama": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803572/HOTEL_e02urc.jpg",
       "description": "Pemandangan megah gedung Harper Palembang dari sudut pandang 360 derajat, berlokasi strategis di pusat kota.",
       "previewImg": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803572/HOTEL_e02urc.jpg",
-      "hfov": 130,
+      "hfov": 100,
       "pitch": -40,
       "yaw": 10,
       "hotSpots": [
