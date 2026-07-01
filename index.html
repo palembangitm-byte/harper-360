@@ -86,6 +86,8 @@
             justify-content: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             height: 54px; /* Sama tinggi dengan tombol toggle sidebar */
+            min-width: 120px; /* Lebar minimal agar selalu terlihat */
+            opacity: 1 !important; /* Paksa opacity selalu 1 */
         }
 
         .logo-overlay img {
@@ -93,6 +95,8 @@
             height: 40px;
             filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
             transition: all 0.3s ease;
+            opacity: 1 !important; /* Paksa gambar selalu terlihat */
+            display: block !important;
         }
 
         .logo-overlay img:hover {
@@ -992,8 +996,8 @@
 </head>
 <body>
 <!-- Logo Overlay -->
-<div class="logo-overlay" style="display: flex;">
-    <img id="mainLogo" src="foto/Harper Palembang.jpg" alt="Harper Logo">
+<div class="logo-overlay" style="display: flex; opacity: 1; visibility: visible;">
+    <img id="mainLogo" src="foto/Harper Palembang.jpg" alt="Harper Logo" style="opacity: 1; visibility: visible; display: block;">
 </div>
 
 <!-- Welcome Modal -->
@@ -1850,6 +1854,20 @@
     });
     // Welcome Modal & GSAP
     document.getElementById('startTourBtn').addEventListener('click', () => {
+        // Pastikan logo selalu terlihat
+        const logoOverlay = document.querySelector('.logo-overlay');
+        const mainLogo = document.getElementById('mainLogo');
+        if (logoOverlay) {
+            logoOverlay.style.display = 'flex';
+            logoOverlay.style.opacity = '1';
+            logoOverlay.style.visibility = 'visible';
+        }
+        if (mainLogo) {
+            mainLogo.style.display = 'block';
+            mainLogo.style.opacity = '1';
+            mainLogo.style.visibility = 'visible';
+        }
+
         gsap.to("#welcomeModal", {
             opacity: 0,
             duration: 1,
