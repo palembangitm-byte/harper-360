@@ -50,11 +50,11 @@
       "previewImg": "https://res.cloudinary.com/dcsvtyhhe/image/upload/v1782803572/HOTEL_e02urc.jpg",
       "hfov": 100,
       "pitch": -40,
-      "yaw": 10,
+      "yaw": 0,
       "hotSpots": [
         {
-          "pitch": -36.69,
-          "yaw": 4.01,
+          "pitch": -40,
+          "yaw": 0,
           "type": "scene",
           "text": "Masuk ke Lobby",
           "sceneId": "lobby",
