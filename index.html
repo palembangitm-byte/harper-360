@@ -111,18 +111,8 @@
             max-width: min(320px, 90vw);
         }
 
-        #custom-logo,
         #info-popup-panel.show {
             pointer-events: auto;
-        }
-
-        #custom-logo {
-            height: 90px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-            border-radius: 18px;
-            box-shadow: var(--shadow-soft);
         }
 
         #info-popup-panel {
@@ -1066,7 +1056,6 @@
 </div>
 
 <div id="left-branding-panel">
-    <img id="custom-logo" src="" alt="Harper Hotel Logo">
     <div id="info-popup-panel">
         <h3 id="info-panel-title">Nama Ruangan</h3>
         <div class="info-divider"></div>
@@ -1102,15 +1091,6 @@
                 tourConfig = await response.json();
             }
             
-            // Update Custom Logo (fixed position/size)
-            const customLogo = document.getElementById('custom-logo');
-            if (tourConfig.settings && tourConfig.settings.logoUrl) {
-                customLogo.src = isAbsoluteUrl(tourConfig.settings.logoUrl) ? tourConfig.settings.logoUrl : tourConfig.settings.logoUrl;
-                customLogo.style.display = 'block';
-            } else {
-                customLogo.style.display = 'none';
-            }
-
             // Update Logo from config
             const logoOverlay = document.querySelector('.logo-overlay');
             const mainLogo = document.getElementById('mainLogo');
