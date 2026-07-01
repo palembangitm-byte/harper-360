@@ -992,10 +992,6 @@
 <!-- Welcome Modal -->
 <div id="welcomeModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
     <div style="text-align: center; max-width: 500px; padding: 2rem; border: 1px solid #C8A96A; border-radius: 20px; background: rgba(17,17,17,0.8);">
-        <!-- Logo di Welcome Modal -->
-        <div style="margin-bottom: 2rem;">
-            <img id="welcomeLogo" src="foto/Logo - Harper (WHITE).png" alt="Harper Logo" style="height: 80px; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));">
-        </div>
         <h1 style="font-family: 'Playfair Display', serif; color: #C8A96A; margin-bottom: 1rem;">Selamat Datang</h1>
         <p style="margin-bottom: 2rem; line-height: 1.6;">Nikmati pengalaman Virtual Tour 360° di Harper Palembang. Jelajahi setiap sudut kenyamanan kami.</p>
         <button id="startTourBtn" style="padding: 12px 30px; background: #C8A96A; border: none; border-radius: 30px; color: #111; font-weight: 600; cursor: pointer; transition: 0.3s;">Mulai Jelajah</button>
@@ -1131,12 +1127,6 @@
                 mainLogo.style.opacity = logoSettings.opacity / 100;
                 mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
                 console.log('Logo set', mainLogo.src);
-                
-                // Update logo di welcome modal juga
-                const welcomeLogo = document.getElementById('welcomeLogo');
-                if (welcomeLogo) {
-                    welcomeLogo.src = isAbsoluteUrl(logoUrl) ? logoUrl : logoUrl;
-                }
 
                 // Apply position (sesuai config)
                 logoOverlay.style.top = '20px';
@@ -1182,6 +1172,15 @@
                 console.log('No logo url or mainLogo not found');
                 // Fallback: Show default logo
                 logoOverlay.style.display = 'flex';
+                mainLogo.style.height = `${logoSettings.size}px`;
+                mainLogo.style.opacity = logoSettings.opacity / 100;
+                mainLogo.style.filter = logoSettings.dropShadow ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' : 'none';
+                
+                // Apply default position (top-left)
+                logoOverlay.style.top = '20px';
+                logoOverlay.style.left = '20px';
+                logoOverlay.style.right = 'auto';
+                logoOverlay.style.transform = 'none';
             }
 
             // Update Music from config (disabled for now to use the new URL)
