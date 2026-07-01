@@ -71,7 +71,7 @@
         .logo-overlay {
             position: fixed;
             top: 1.5rem;
-            left: calc(2rem + 54px + 0.5rem); /* Sesuaikan jarak tanpa latar belakang */
+            left: calc(2rem + 54px + 2rem); /* Lebih ke kanan */
             z-index: 10001; /* Di atas welcome modal agar selalu terlihat */
             pointer-events: auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -92,7 +92,7 @@
 
         .logo-overlay img {
             width: auto;
-            height: 40px;
+            height: 60px; /* Lebih besar */
             filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
             transition: all 0.3s ease;
             opacity: 1 !important; /* Paksa gambar selalu terlihat */
@@ -984,7 +984,7 @@
 
             .logo-overlay {
                 top: 1rem;
-                left: calc(1rem + 54px + 0.5rem); /* Sejajar tombol toggle sidebar mobile */
+                left: calc(1rem + 54px + 1.5rem); /* Lebih ke kanan mobile */
                 padding: 0;
                 height: auto;
                 background: transparent;
@@ -992,7 +992,7 @@
                 box-shadow: none;
             }
             .logo-overlay img {
-                height: 35px !important;
+                height: 45px !important; /* Lebih besar mobile */
             }
         }
     </style>
